@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'email', 'password', 'stu_id', 'nickname', 'upload', 'download', 'collection', 'avatar', 'score'
     ];
 
     /**
@@ -36,4 +36,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function info() {
+        $info = array (
+            'user_id' => $this->id,
+            'stu_id' => $this->stu_id,
+            'nickname' => $this->nickname,
+            'email' => $this->email,
+            'score' => $this->score,
+            'download' => $this->download,
+            'upload' => $this->upload,
+            'collection' => $this->collection,
+            'avatar' => $this->avatar
+        );
+        return $info;
+    }
 }

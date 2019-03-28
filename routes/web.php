@@ -1,5 +1,7 @@
 <?php
 
+use \Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,6 +13,15 @@
 |
 */
 
+
 Route::get('/', function () {
     return view('welcome');
+});
+Route::group(['middleware' => 'cookie'], function () {
+    Route::post('/login', 'UserController@login');
+    Route::group(['middleware' => 'loginCheck'],function (){
+        Route::get('/user/info', 'UserController@getUserInfo');
+        Route::post('/user/avatar', 'UserController@saveAvatar');
+        Route::post('/upload', 'DocumentController@upload');
+    });
 });
