@@ -11,7 +11,7 @@
 |3|错误访问|0|
 |4|未知错误|0|
 |5|其他错误|0|
-|6|未登录|1|
+|6|未登录|1|    
 
 ## 用户  
 
@@ -30,7 +30,7 @@
 
 * 返回示例  
 
-```json
+```json  
 {
     "code":0,
     "status":"成功",
@@ -59,14 +59,15 @@
 
 ### 上传  
 
-> **url** :  `/upload`  
+> **url** :  `/document`  
 
-* 访问方式：  POST  
+* 访问方式：  PUT  
 
-> * 请求参数说明：
+> * 请求参数说明：需要一个_method字段为put  
 >  
 > |参数名|参数类型|参数解释|示例|正则限制|  
 > | :----: | :---: | :---: | :---: | :---: |
+> |_method|String|定义请求类型为put|put||
 > |title|String|标题|模电资料|`/^[\s\S]{0,300}$/`|
 > |description|String|摘要|2017级模电期末复习资料|`/^[\s\S]{0,600}$/`|  
 > |score|Integer|下载需要积分数(0-19)|5|`/^(1|)\d$/`|
@@ -79,7 +80,7 @@
 
 * 返回示例  
 
-```json
+```json  
 {
     "code":0,
     "status":"成功",
@@ -91,10 +92,45 @@
 >  
 > |参数名|参数类型|参数解释| 
 > | :----: | :---: | :---: |
-> |user_id|Integer|用户标识|
+> |user_id|Integer|用户标识|  
 
+### 文件信息  
 
-* 头像地址为 /uploadfolder/avatar/{avatar}  
+> **url** : `/document/{id}`  
+
+* 访问方式： GET  
+
+> * 请求参数说明: id为文件id  
+
+* 返回示例  
+
+```json  
+{
+    "code":0,
+    "status":"成功",
+    "data":{
+        "id":2,
+        "name":"湘大文库改版说明文档.docx",
+        "type":3,
+        "tag":"3",
+        "uploader":1,
+        "uploader_nickname":"未命名的小朋友",
+        "score":5,
+        "downloads":0,
+        "description":"湘大文科需求文档",
+        "title":"湘大文科需求文档",
+        "buy":false
+    }
+}
+```  
+
+> * 返回参数说明：
+>  
+> |参数名|参数类型|参数解释| 
+> | :----: | :---: | :---: |
+> |uploader|Integer|上传者id|
+> |score|Integer|下载所需积分|  
+> |buy|bool|是否已购买|
 
 # 维护说明  
 
@@ -104,7 +140,8 @@
 
 ## 数据库  
 
-> 见 .env 文件  **DB_DATABASE**
+> 见 .env 文件  **DB_DATABASE**  
+> 数据库结构见数据库本身 或 database/migrations 内迁移文件
 
 ## 个人配置信息  
 
@@ -114,7 +151,7 @@
 ## 自定义全局 类、函数  
 
 * DFA 敏感词过滤  
-* check checkUser msg compress saveFile
+* check checkUser msg compress saveFile(具体功能看文件注释)  
 
 * 文件位置
 > /app/helper/DFA.php  

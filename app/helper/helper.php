@@ -53,7 +53,9 @@
             3 => '错误访问',
             4 => '未知错误',
             5 => '其他错误',
-            6 => '未登录'
+            6 => '未登录',
+            7 => '积分不足',
+            8 => '重复购买'
         );
 
         $result = array(
@@ -148,7 +150,6 @@
      */
 
     function saveFile(UploadedFile $file = null, int $file_limit = 2048000, string $savePath = "", array $type = [], bool $compress = false, string $filename = "") {
-        $name = $file->getFilename();
         $size = $file->getSize();
         if ($size > $file_limit) { //2M
             return msg(3, '文件大小' . __LINE__);
@@ -156,7 +157,9 @@
 
         $allow_ext = array_keys($type);
         $extension = $file->getClientOriginalExtension();
-        $filename = $filename . "/" . $extension;
+        $name = $file->getClientOriginalName();
+
+        $filename = $filename . "." . $extension;
         if (in_array($extension, $allow_ext)) {
             $file->move($savePath, $filename);
             $compress ? compress($savePath . '/' . $filename) : 0;
@@ -164,9 +167,10 @@
             $data = array(
                 'size' => $size,
                 'name' => $name,
-                'filename' => $filename,vim
+                'filename' => $filename,
                 'type' => $type,
                 'uploader' => session('id'),
+                'uploader_nickname' => \App\User::query()->find(session('id'))->nickname,
                 'md5' => md5_file($savePath . '/' . $filename),
             );
 

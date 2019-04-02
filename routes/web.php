@@ -22,6 +22,10 @@ Route::group(['middleware' => 'cookie'], function () {
     Route::group(['middleware' => 'loginCheck'],function (){
         Route::get('/user/info', 'UserController@getUserInfo');
         Route::post('/user/avatar', 'UserController@saveAvatar');
-        Route::post('/upload', 'DocumentController@upload');
+
+        Route::put('/document', 'DocumentController@upload');
+        Route::get('/document/{id}', 'DocumentController@documentInfo')->where(["id"=>'[0-9]+']);
+
+        Route::get('/buy/{id}', 'DocumentController@buyDocument')->where(["id"=>'[0-9]+']);
     });
 });

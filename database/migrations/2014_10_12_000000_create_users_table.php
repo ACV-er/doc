@@ -26,9 +26,9 @@ class CreateUsersTable extends Migration
 
             $table->unsignedInteger('score')->default(0);
 
-            $table->string('download', 2000)->default('{"count":0,"data":[]}');
-            $table->string('upload', 2000)->default('{"count":0,"data":[]}');
-            $table->string('collection', 2000)->default('{"count":0,"data":[]}');
+            $table->string('download', 2000)->default('[]');
+            $table->string('upload', 2000)->default('[]');
+            $table->string('collection', 2000)->default('[]');
 
             $table->timestamps();
         });

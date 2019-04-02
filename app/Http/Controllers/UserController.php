@@ -86,7 +86,7 @@ class UserController extends Controller {
         $savePath = public_path() . '/uploadfolder/avatar';
 
         // 如下 config('user.*') 值为 \app\config\user 中 键为*的元素的值
-        $filename = session('id') . '.jpg';
+        $filename = session('id');
         $request->file('avatar');
         $file_type = config('user.avatar_type');
         $file_limit = config('user.avatar_limit');
@@ -94,10 +94,13 @@ class UserController extends Controller {
             $file_limit, //文件大小限制
             $savePath,
             $file_type,
-            false);
+            false,
+            $filename);
         if (is_string($file_info)) {
             return $file_info;
         }
-        User::query()->where('id', session('id'))->update(['avatar' => $file_info['filename']]);
+        $result = User::query()->where('id', session('id'))->update(['avatar' => $file_info['filename']]);
+
+        return msg($result?0:3, __LINE__);
     }
 }

@@ -15,6 +15,10 @@ class LoginCheck
      */
     public function handle($request, Closure $next)
     {
+        if(session('login') !== true) {
+            return response(msg(6, null), 200);
+        }
+
         return $next($request);
     }
 }
