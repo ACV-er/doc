@@ -43,11 +43,12 @@ class User extends Authenticatable
             'nickname' => $this->nickname,
             'email' => $this->email,
             'score' => $this->score,
-            'download' => $this->download,
-            'upload' => $this->upload,
-            'collection' => $this->collection,
             'avatar' => $this->avatar
         );
         return $info;
+    }
+
+    public function documents() {
+        return $this->hasMany('App\Document', 'uploader', 'id');
     }
 }
