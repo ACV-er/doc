@@ -156,7 +156,7 @@
 
         $allow_ext = array_keys($type);
         $extension = $file->getClientOriginalExtension();
-        $filename = $filename . $extension;
+        $filename = $filename . "/" . $extension;
         if (in_array($extension, $allow_ext)) {
             $file->move($savePath, $filename);
             $compress ? compress($savePath . '/' . $filename) : 0;
@@ -164,7 +164,7 @@
             $data = array(
                 'size' => $size,
                 'name' => $name,
-                'filename' => $filename,
+                'filename' => $filename,vim
                 'type' => $type,
                 'uploader' => session('id'),
                 'md5' => md5_file($savePath . '/' . $filename),
