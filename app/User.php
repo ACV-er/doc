@@ -43,7 +43,9 @@ class User extends Authenticatable
             'nickname' => $this->nickname,
             'email' => $this->email,
             'score' => $this->score,
-            'avatar' => $this->avatar
+            'avatar' => $this->avatar,
+            'downloads' => count(json_decode($this->download, true)),
+            'collections' => count(json_decode($this->collection, true))
         );
         return $info;
     }
@@ -54,6 +56,9 @@ class User extends Authenticatable
      */
     private function addDocument($key, int $document_id) {
         $new = json_decode($this->$key, true);
+        if(in_array($document_id, $new)) {
+            return; //有就算了 不影响
+        }
         array_push($new, $document_id);
 
         $this->$key = json_encode($new);
@@ -63,9 +68,9 @@ class User extends Authenticatable
     private function delDocument($key, int $document_id) {
         $new = json_decode($this->$key, true);
         if(!in_array($document_id, $new)) {
-            return;
+            return; //没有就算了 不影响
         }
-        array_push($new, $document_id);
+        $new = array_diff($new, [$document_id]);
 
         $this->$key = json_encode($new);
         $this->save();

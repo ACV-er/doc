@@ -22,7 +22,10 @@ class DocumentController extends Controller {
         );
 
         // 检查数据是否完整
-        if (!$request->hasFile('document') || !$request->has(array_keys($mod))) {
+        if (
+            !( $request->hasFile('document') || $request->routeIs('updateDocumentInfo') )
+            || !$request->has(array_keys($mod))
+        ) {
             return msg(1, __LINE__);
         }
 
@@ -31,20 +34,24 @@ class DocumentController extends Controller {
             return msg(3, '数据格式错误' . __LINE__);
         }
 
-        // 如下 config('user.*') 值为 \app\config\user 中 键为*的元素的值
-        $file_limit = config('user.document_limit');
-        $file_type = config('user.document_type');
+        $file_info = array();
+        if($request->hasFile('document')) {
+            // 如下 config('user.*') 值为 \app\config\user 中 键为*的元素的值
+            $file_limit = config('user.document_limit');
+            $file_type = config('user.document_type');
 
-        $filename = time().rand(0, 1000);
-        $file_info = saveFile($request->file('document'),
-            $file_limit, //文件大小限制
-            storage_path() . '/document',
-            $file_type,
-            false,
-            $filename);
-        if (is_string($file_info)) {
-            return $file_info;
+            $filename = time().rand(0, 1000);
+            $file_info = saveFile($request->file('document'),
+                $file_limit, //文件大小限制
+                storage_path() . '/document',
+                $file_type,
+                false,
+                $filename);
+            if (is_string($file_info)) {
+                return $file_info;
+            }
         }
+
         $data = array_merge($data, $file_info);
         return $data;
     }
@@ -52,7 +59,7 @@ class DocumentController extends Controller {
     /**
      * 上传文件
      * @param Request $request 包含文件 及其信息 具体见接口文档
-     * @return array|false|string
+     * @return string
      */
     public function upload(Request $request) { //
         $data = $this->handleData($request);
@@ -73,25 +80,87 @@ class DocumentController extends Controller {
                 'document_file_name' => $document->filename
             ]);
 
-            return msg(0, null);
+            return msg(0, __LINE__);
         } else {
             unlink(storage_path() . '/document/' . $data['filename']); //模型插入数据库失败时需要删除已存储的文件
             return msg(4, __LINE__);
         }
     }
 
+    /**获取文档信息
+     * @param Request $request
+     * @return string
+     */
     public function documentInfo(Request $request) {
         $document = Document::query()->find($request->route('id'));
         if(!$document) {
             return msg(3, __LINE__);
         }
         $downloads = User::query()->find(session('id'))->download;
-        $documents = json_decode($downloads, true)['data'];
+        $documents = json_decode($downloads, true);
         $buy = in_array($request->route('id'), $documents);
 
         return msg(0, array_merge($document->info(), array('buy' => $buy)));
     }
 
+    /**更新文档信息
+     * @param Request $request
+     * @return string
+     */
+    public function updateDocumentInfo(Request $request) {
+        $data = $this->handleData($request);
+        if (is_string($data)) {
+            return $data;
+        }
+
+        $document = Document::query()->find($request->route('id'));
+        $result = $document->update($data);
+
+        if($result) {
+            return msg(0, __LINE__);
+        } else {
+            return msg(4, "BUG！" . __LINE__);
+        }
+    }
+
+    /**更新文档文件 （不删除原来的文件，记录在流水中，备用）
+     * @param Request $request
+     * @return string
+     */
+    public function updateDocumentFile(Request $request) {
+        if(!$request->hasFile('document')) {
+            return msg(3, "文件不存在" . __LINE__);
+        }
+
+        // 如下 config('user.*') 值为 \app\config\user 中 键为*的元素的值
+        $file_limit = config('user.document_limit');
+        $file_type = config('user.document_type');
+
+        $filename = time().rand(0, 1000);
+        $file_info = saveFile($request->file('document'),
+            $file_limit, //文件大小限制
+            storage_path() . '/document',
+            $file_type,
+            false,
+            $filename);
+        if (is_string($file_info)) {
+            return $file_info;
+        }
+
+
+        $result = Document::query()->find($request->route('id'))->update($file_info);
+        if($result) {
+            return msg(0, __LINE__);
+        } else {
+            return msg(3, __LINE__);
+        }
+
+    }
+
+    /**购买文档
+     * @param Request $request
+     * @return string
+     */
     public function buyDocument(Request $request) {
         $user = User::query()->find(session('id'));
         if(in_array($request->route('id') , json_decode($user->download))) {
@@ -118,19 +187,19 @@ class DocumentController extends Controller {
                 'user_id' => $user->id,
                 'spend' => $document->score,
                 'way' => '获取文档',
-                'time' => time()
+                'time' => date('Y-m-d H:i:s', time())
             ],[
                 'user_id' => $uploader->id,
                 'spend' => $document->score,
                 'way' => '文档被获取',
-                'time' => time()
+                'time' => date('Y-m-d H:i:s', time())
             ]
         ]);
         DB::table('buys')->insert([
             'user_id' => $user->id,
             'spend' => $document->score,
             'document_id' => $document->id,
-            'time' => time()
+            'time' => date('Y-m-d H:i:s', time())
         ]);
 
         return msg(0, '购买成功');

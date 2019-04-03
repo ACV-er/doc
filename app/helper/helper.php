@@ -1,6 +1,7 @@
 <?php
 
     use Symfony\Component\HttpFoundation\File\UploadedFile;
+    use App\User;
 
     /**
      * 检测数据是否符合正则
@@ -55,7 +56,8 @@
             5 => '其他错误',
             6 => '未登录',
             7 => '积分不足',
-            8 => '重复购买'
+            8 => '重复购买',
+            9 => '未购买'
         );
 
         $result = array(
@@ -170,7 +172,7 @@
                 'filename' => $filename,
                 'type' => $type,
                 'uploader' => session('id'),
-                'uploader_nickname' => \App\User::query()->find(session('id'))->nickname,
+                'uploader_nickname' => User::query()->find(session('id'))->nickname,
                 'md5' => md5_file($savePath . '/' . $filename),
             );
 

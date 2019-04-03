@@ -44,7 +44,6 @@ class UserController extends Controller {
                 } else {
                     return msg(4, __LINE__);
                 }
-
             }
         } else { //查询到该用户记录
             if ($user->password === md5($data['password'])) { //匹配数据库中的密码
@@ -65,7 +64,7 @@ class UserController extends Controller {
     }
 
     public function getUserInfo() {
-        $user = User::query()->where('id', session('id'))->first();
+        $user = User::query()->find(session('id'));
 
         if ($user) {
             return msg(0, $user->info());
@@ -79,7 +78,7 @@ class UserController extends Controller {
      * @param Request $request 带有头像文件的请求
      * @return array|false|string
      */
-    protected function saveAvatar(Request $request) {
+    public function saveAvatar(Request $request) {
         if (!$request->hasFile('avatar')) {
             return msg(3, '文件格式错误');
         }
@@ -90,7 +89,7 @@ class UserController extends Controller {
         $request->file('avatar');
         $file_type = config('user.avatar_type');
         $file_limit = config('user.avatar_limit');
-        $file_info = saveFile($request->file('document'),
+        $file_info = saveFile($request->file('avatar'),
             $file_limit, //文件大小限制
             $savePath,
             $file_type,
@@ -103,4 +102,44 @@ class UserController extends Controller {
 
         return msg($result?0:3, __LINE__);
     }
+
+    public function changeNickname(Request $request) {
+        $mod = array(
+            'nickname' => '/^[\s\S]{2,60}$/'
+        );
+        $data = $request->only(['nickname']);
+        if(!check($mod, $data)) {
+            return msg(3, '昵称格式错误' . __LINE__);
+        }
+
+        $result = User::query()->find(session('id'))->update($data);
+
+        if($result) {
+            return msg(0, __LINE__);
+        } else {
+            return msg(4, __LINE__);
+        }
+    }
+
+    public function addCollection(Request $request) {
+        $user = User::query()->find(session('id'));
+        if(!$user) {
+            return msg(4, "???怎么没有这个人??? BUG！".__LINE__); //正常情况不会走到这里
+        }
+
+        $user->addCollection($request->route('id'));
+        return msg(0, __LINE__);
+    }
+
+    public function delCollection(Request $request) {
+        $user = User::query()->find(session('id'));
+        if(!$user) {
+            return msg(4, "???怎么没有这个人??? BUG！".__LINE__); //正常情况不会走到这里
+        }
+
+        $user->delCollection($request->route('id'));
+        return msg(0, __LINE__);
+    }
+
+
 }

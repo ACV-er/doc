@@ -19,12 +19,21 @@ Route::get('/', function () {
 });
 Route::group(['middleware' => 'cookie'], function () {
     Route::post('/login', 'UserController@login');
-    Route::group(['middleware' => 'loginCheck'],function (){
+    Route::group(['middleware' => 'loginCheck'],function (){ //登录之后允许操作
         Route::get('/user/info', 'UserController@getUserInfo');
         Route::post('/user/avatar', 'UserController@saveAvatar');
 
+        Route::post('/user/nickname', 'UserController@changeNickname');
+
+        Route::put('/collection/{id}', 'UserController@addCollection')->where(["id"=>'[0-9]+']);
+        Route::delete('/collection/{id}', 'UserController@delCollection')->where(["id"=>'[0-9]+']);
+
         Route::put('/document', 'DocumentController@upload');
-        Route::get('/document/{id}', 'DocumentController@documentInfo')->where(["id"=>'[0-9]+']);
+        Route::group(['middleware' => 'ownership'], function () { // 验证所有权
+            Route::post('/document/{id}', 'DocumentController@updateDocumentFile');
+            Route::post('/document/info/{id}', 'DocumentController@updateDocumentInfo')->where(["id"=>'[0-9]+'])->name('updateDocumentInfo');
+            Route::get('/document/info/{id}', 'DocumentController@documentInfo')->where(["id"=>'[0-9]+']);
+        });
 
         Route::get('/buy/{id}', 'DocumentController@buyDocument')->where(["id"=>'[0-9]+']);
     });
