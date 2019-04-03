@@ -4,15 +4,13 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDocumentsTable extends Migration
-{
+class CreateDocumentsTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         Schema::create('documents', function (Blueprint $table) {
             $table->increments('id');
 
@@ -24,11 +22,14 @@ class CreateDocumentsTable extends Migration
             $table->string('tag');
 
             $table->unsignedInteger('uploader');
+            $table->foreign('uploader')->references('id')->on('users');
+            $table->string('uploader_nickname');
             $table->unsignedInteger('downloads')->default(0);
 
             $table->string('title', 60);
             $table->text('description');
-            $table->integer('score');
+            $table->integer('score')->default(0);
+            $table->string('md5', 65);
 
             $table->timestamps();
         });
@@ -39,8 +40,7 @@ class CreateDocumentsTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('documents');
     }
 }

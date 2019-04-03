@@ -5,24 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 
-class UserController extends Controller
-{
+class UserController extends Controller {
     //
 
-    private function chechUser($sid, $password)
-    {
-        $api_url = "https://api.sky31.com/edu-new/student_info.php";
-        $api_url = $api_url . "?role=" . env('ROLE') . '&hash=' . env('HASH') . '&sid=' . $sid . '&password=' . $password;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $api_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $output = curl_exec($ch);
-        curl_close($ch);
-        return json_decode($output, true);
-    }
-
-    public function login(Request $request)
-    {
+    public function login(Request $request) {
         session(['login' => false, 'id' => null]);
         $mod = array(
             'stu_id' => '/^20[\d]{8,10}$/',
@@ -37,52 +23,48 @@ class UserController extends Controller
         };
         $user = User::query()->where('stu_id', $data['stu_id'])->first();
 
-        if (!$user) {
-            // 该用户未在数据库中 用户名错误 或 用户从未登录
+        if (!$user) { // 该用户未在数据库中 用户名错误 或 用户从未登录
             //利用三翼api确定用户账号密码是否正确
-            $output = $this->chechUser(urlencode($data['stu_id']), $data['password']);
+            $output = checkUser($data['stu_id'], $data['password']);
 
             if ($output['code'] == 0) {
-                $info = array(
-                    'nickname' => '未命名的小朋友',
+                $user = new User([
+                    'nickname' => '未命名的小朋友', //默认信息
                     'stu_id' => $data['stu_id'],
                     'password' => md5($data['password']),
-                );
-                $user = new User($info);
+                ]);
                 $result = $user->save();
+
                 if ($result) {
+                    //直接使用上面的 $user 会导致没有id  这个对象新建的时候没有id save后才有的id 但是该id只是在数据库中 需要再次查找模型
+                    $user = User::query()->where('stu_id', $data['stu_id'])->first();
                     session(['login' => true, 'id' => $user->id]);
+
                     return msg(0, $user->info());
                 } else {
                     return msg(4, __LINE__);
                 }
 
-            } else {
-                //失败
-                return msg(2, __LINE__);
             }
-        } else {
-            if ($user->password === md5($data['password'])) {
+        } else { //查询到该用户记录
+            if ($user->password === md5($data['password'])) { //匹配数据库中的密码
                 session(['login' => true, 'id' => $user->id]);
                 return msg(0, $user->info());
-            } else {
-                $output = $this->chechUser(urlencode($data['stu_id']), $data['password']);
+            } else { //匹配失败 用户更改密码或者 用户名、密码错误
+                $output = checkUser($data['stu_id'], $data['password']);
                 if ($output['code'] == 0) {
                     $user->password = md5($data['password']);
                     $user->save();
                     session(['login' => true, 'id' => $user->id]);
                     return msg(0, $user->info());
-                } else {
-                    return msg(2, __LINE__);
                 }
             }
-
         }
 
+        return msg(2, __LINE__);
     }
 
-    public function getUserInfo()
-    {
+    public function getUserInfo() {
         $user = User::query()->where('id', session('id'))->first();
 
         if ($user) {
@@ -92,25 +74,33 @@ class UserController extends Controller
         }
     }
 
-    protected function saveAvatar(Request $request)
-    {
+    /**
+     * 单独保存头像文件
+     * @param Request $request 带有头像文件的请求
+     * @return array|false|string
+     */
+    protected function saveAvatar(Request $request) {
         if (!$request->hasFile('avatar')) {
             return msg(3, '文件格式错误');
         }
-        $file = $request->file('avatar');
-        $allow_ext = ['jpg', 'jpeg', 'png', 'gif'];
-        $extension = $file->getClientOriginalExtension();
-        if ($file->getSize() > 2048000) { //2M
-            return msg(3, '文件大小' . __LINE__);
+        $savePath = public_path() . '/uploadfolder/avatar';
+
+        // 如下 config('user.*') 值为 \app\config\user 中 键为*的元素的值
+        $filename = session('id');
+        $request->file('avatar');
+        $file_type = config('user.avatar_type');
+        $file_limit = config('user.avatar_limit');
+        $file_info = saveFile($request->file('document'),
+            $file_limit, //文件大小限制
+            $savePath,
+            $file_type,
+            false,
+            $filename);
+        if (is_string($file_info)) {
+            return $file_info;
         }
-        if (in_array($extension, $allow_ext)) {
-            $savePath = public_path() . '/upload/avatar';
-            $filename = session('id') . '.jpg';
-            $file->move($savePath, $filename);
-            User::query()->where('id', session('id'))->update(['avatar' => $filename]);
-            return msg(0, '成功');
-        } else {
-            return msg(3, '文件格式错误'.__LINE__);
-        }
+        $result = User::query()->where('id', session('id'))->update(['avatar' => $file_info['filename']]);
+
+        return msg($result?0:3, __LINE__);
     }
 }
