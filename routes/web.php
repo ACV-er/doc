@@ -17,13 +17,21 @@ use \Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/upload/new', 'DocumentController@newUpload');
+Route::get('/upload/sort', 'DocumentController@sortUpload');
+
 Route::group(['middleware' => 'cookie'], function () {
     Route::post('/login', 'UserController@login');
     Route::group(['middleware' => 'loginCheck'],function (){ //登录之后允许操作
+
         Route::get('/user/info', 'UserController@getUserInfo');
         Route::post('/user/avatar', 'UserController@saveAvatar');
-
         Route::post('/user/nickname', 'UserController@changeNickname');
+
+        Route::get('/user/upload', 'UserController@uploadList');
+        Route::get('/user/download', 'UserController@downloadList');
+        Route::get('/user/collection', 'UserController@collectionList');
 
         Route::put('/collection/{id}', 'UserController@addCollection')->where(["id"=>'[0-9]+']);
         Route::delete('/collection/{id}', 'UserController@delCollection')->where(["id"=>'[0-9]+']);
@@ -36,5 +44,7 @@ Route::group(['middleware' => 'cookie'], function () {
         });
 
         Route::get('/buy/{id}', 'DocumentController@buyDocument')->where(["id"=>'[0-9]+']);
+        Route::get('/download/{id}', 'DocumentController@downloadDocument')->where(["id"=>'[0-9]+'])->name('download');
     });
 });
+

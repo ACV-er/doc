@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Document;
 use Illuminate\Http\Request;
 use App\User;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller {
     //
@@ -115,6 +117,10 @@ class UserController extends Controller {
         $result = User::query()->find(session('id'))->update($data);
 
         if($result) {
+            // 同步更新昵称
+            DB::table('documents')->where('uploader', session('id'))
+                ->update(['uploader_nickname' => $data['nickname']]);
+
             return msg(0, __LINE__);
         } else {
             return msg(4, __LINE__);
@@ -139,6 +145,33 @@ class UserController extends Controller {
 
         $user->delCollection($request->route('id'));
         return msg(0, __LINE__);
+    }
+
+    public function uploadList() {
+        $user = User::query()->find(session('id'));
+        $uploads = json_decode($user->upload, true);
+        $upList = DB::table('documents')->whereIn('id', $uploads)
+            ->get( config('user.document_public_info') )->toArray();
+
+        return msg(0, $upList);
+    }
+
+    public function downloadList() {
+        $user = User::query()->find(session('id'));
+        $downloads = json_decode($user->download, true);
+        $downloadList = DB::table('documents')->whereIn('id', $downloads)
+            ->get( config('user.document_public_info') )->toArray();
+
+        return msg(0, $downloadList);
+    }
+
+    public function collectionList() {
+        $user = User::query()->find(session('id'));
+        $collections = json_decode($user->collection, true);
+        $collectionList = DB::table('documents')->whereIn('id', $collections)
+            ->get( config('user.document_public_info') )->toArray();
+
+        return msg(0, $collectionList);
     }
 
 

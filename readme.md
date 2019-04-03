@@ -82,7 +82,7 @@
 
 * 返回示例：  
 
-```json
+```json  
 {
     "code":0,
     "status":"成功",
@@ -117,7 +117,7 @@
 
 * 返回示例  
 
-```json
+```json  
 {
     "code":0,
     "status":"成功",
@@ -153,6 +153,79 @@
 
 > * 返回参数说明：无  
 
+### 个人(下载 上传 收藏)  及 最新上传 下载排行  
+
+> **url** : `/user/download` `/user/upload` 
+`/user/collection` `/upload/new` `/upload/sort`  
+
+* 访问方式： GET  
+
+> 请求参数说明：无  
+
+* 返回示例
+
+```json  
+{
+    "code":0,
+    "status":"成功",
+    "data":[
+        {
+            "id":1,
+            "name":"湘大文库改版说明文档.docx",
+            "type":3,
+            "tag":"3",
+            "uploader":1,
+            "uploader_nickname":"小白",
+            "title":"湘大文科需求文档",
+            "downloads":0,
+            "description":"湘大文科需求文档更改",
+            "score":5,
+            "size":962545,
+            "md5":"8075739a3b804ee0c316572aaabdea55",
+            "created_at":"2019-04-03 02:44:33"
+        },
+        {
+            "id":2,
+            "name":"湘大文库改版说明文档.docx",
+            "type":3,
+            "tag":"3",
+            "uploader":1,
+            "uploader_nickname":"未命名的小朋友",
+            "title":"湘大文科需求文档",
+            "downloads":0,
+            "description":"湘大文科需求文档更改",
+            "score":5,
+            "size":962545,
+            "md5":"8075739a3b804ee0c316572aaabdea55",
+            "created_at":"2019-04-03 02:44:33"
+        }
+    ]
+}
+```  
+
+* type tag 值与数字对应关系(以后有改动)
+
+> > type对应数组:  
+> 
+> ```  
+> ['pdf' => 1, 'doc' => 2, 'docx' => 3, 'txt' => 4, 'md' => 5, 'xlsx' => 6, 'ppt' => 7]
+> ```  
+> 
+> > tag 对应数组:  
+> 
+> ``` 
+> ["物理" => 1, "计算机" => 2, "法学" => 3, "文学" => 4, "历史学" => 5, "政治" => 6]
+> ```  
+
+> * 返回参数说明：
+>  
+> |参数名|参数类型|参数解释|  
+> | :----: | :---: | :---: |
+> |uploader|Integer|上传者id|
+> |uploader_nickname|string|上传者nickname|
+> |score|Integer|下载所需积分|
+> |created_at|String|文件发布时间|   
+
 ## 文档  
 
 ### 上传  
@@ -171,10 +244,6 @@
 > |tag|Integer|文件标签，数组下标|0|`/^\d$/`|
 > |document|bytes|文档文件，二进制形式|||  
 
-> tag 对应数组, 可改动  
-```json
-["物理","计算机","法学","文学","历史学","政治"]
-```
 
 * 返回示例  
 
@@ -188,7 +257,7 @@
 
 > * 返回参数说明：无  
 
-### 文档信息  
+### 单个文档信息  
 
 > **url** : `/document/info/{id}`  
 
@@ -213,6 +282,7 @@
         "downloads":0,
         "description":"湘大文科需求文档",
         "title":"湘大文科需求文档",
+        "created_at":"2019-04-03 02:44:30",
         "buy":false
     }
 }
@@ -223,8 +293,10 @@
 > |参数名|参数类型|参数解释| 
 > | :----: | :---: | :---: |
 > |uploader|Integer|上传者id|
+> |uploader_nickname|string|上传者nickname|
 > |score|Integer|下载所需积分|  
-> |buy|bool|是否已购买|  
+> |buy|bool|是否已购买|
+> |created_at|String|文件发布时间|  
 
 ### 文档信息更新  
 
@@ -243,7 +315,7 @@
 
 * 返回示例  
 
-```json
+```json  
 {
     "code":0,
     "status":"成功",
@@ -267,10 +339,14 @@
 
 ### 文档下载  
 
+> **url** : `/download/{id}`  
+
+> 描述 无 直接打开为下载文件  
+
 
 * 返回示例  
 
-```json
+```json  
 {
     "code":0,
     "status":"成功",

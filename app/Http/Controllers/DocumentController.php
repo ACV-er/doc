@@ -6,6 +6,7 @@ use App\Document;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class DocumentController extends Controller {
     /**
@@ -205,5 +206,30 @@ class DocumentController extends Controller {
         return msg(0, '购买成功');
     }
 
+    public function downloadDocument(Request $request) {
+        $user = User::query()->find(session('id'));
+        $document = Document::query()->find($request->route('id'));
+        if(!in_array($request->route('id') , json_decode($user->download))) {
+            return msg(9, "没有下载权" . __LINE__);
+        }
+        $document->downloads += 1;
+        $document->save();
+        $file = storage_path() . '/document' . "/" . $document->filename;
+        return Response::download($file, $document->name);
+    }
+
+    public function newUpload() {
+        $documentList = DB::table('documents')->orderBy('updated_at', 'desc')->limit(10)
+            ->get( config('user.document_public_info') )->toArray();
+
+        return msg(0, $documentList);
+    }
+
+    public function sortUpload() {
+        $documentList = DB::table('documents')->orderBy('downloads', 'desc')->limit(10)
+            ->get( config('user.document_public_info') )->toArray();
+
+        return msg(0, $documentList);
+    }
 
 }
