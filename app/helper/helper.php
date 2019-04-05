@@ -44,7 +44,7 @@
      * 设置返回值
      * @param $code
      * @param $msg
-     * @return false|string
+     * @return string
      */
     function msg($code, $msg) {
         $status = array(
@@ -57,7 +57,8 @@
             6 => '未登录',
             7 => '积分不足',
             8 => '重复购买',
-            9 => '未购买'
+            9 => '未购买',
+            10 => '目标不存在'
         );
 
         $result = array(

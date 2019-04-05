@@ -18,8 +18,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/upload/new', 'DocumentController@newUpload');
-Route::get('/upload/sort', 'DocumentController@sortUpload');
+Route::get('/upload/new/{page}', 'DocumentController@newUpload')->where(["page"=>'[0-9]+']);
+Route::get('/upload/sort/{page}', 'DocumentController@sortUpload')->where(["page"=>'[0-9]+']);
+Route::get('/document/search/{page}', 'DocumentController@search')->where(["page"=>'[0-9]+']);
 
 Route::group(['middleware' => 'cookie'], function () {
     Route::post('/login', 'UserController@login');
@@ -29,18 +30,19 @@ Route::group(['middleware' => 'cookie'], function () {
         Route::post('/user/avatar', 'UserController@saveAvatar');
         Route::post('/user/nickname', 'UserController@changeNickname');
 
-        Route::get('/user/upload', 'UserController@uploadList');
-        Route::get('/user/download', 'UserController@downloadList');
-        Route::get('/user/collection', 'UserController@collectionList');
+        Route::get('/user/upload/{page}', 'UserController@uploadList')->where(["page"=>'[0-9]+']);
+        Route::get('/user/download/{page}', 'UserController@downloadList')->where(["page"=>'[0-9]+']);
+        Route::get('/user/collection/{page}', 'UserController@collectionList')->where(["page"=>'[0-9]+']);
 
         Route::put('/collection/{id}', 'UserController@addCollection')->where(["id"=>'[0-9]+']);
         Route::delete('/collection/{id}', 'UserController@delCollection')->where(["id"=>'[0-9]+']);
 
         Route::put('/document', 'DocumentController@upload');
+        Route::get('/document/info/{id}', 'DocumentController@documentInfo')->where(["id"=>'[0-9]+']);
         Route::group(['middleware' => 'ownership'], function () { // 验证所有权
             Route::post('/document/{id}', 'DocumentController@updateDocumentFile');
             Route::post('/document/info/{id}', 'DocumentController@updateDocumentInfo')->where(["id"=>'[0-9]+'])->name('updateDocumentInfo');
-            Route::get('/document/info/{id}', 'DocumentController@documentInfo')->where(["id"=>'[0-9]+']);
+            Route::delete('/document/{id}', 'DocumentController@delDocument')->where(["id"=>'[0-9]+']);
         });
 
         Route::get('/buy/{id}', 'DocumentController@buyDocument')->where(["id"=>'[0-9]+']);

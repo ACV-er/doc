@@ -9,7 +9,7 @@
 |1|缺失参数|0|
 |2|账号密码错误|1|
 |3|错误访问|0|
-|4|未知错误|0|
+|4|未知错误|1|
 |5|其他错误|0|
 |6|未登录|1|  
 
@@ -153,14 +153,18 @@
 
 > * 返回参数说明：无  
 
-### 个人(下载 上传 收藏)  及 最新上传 下载排行  
+### 个人(下载 上传 收藏)列表  及 最新上传 下载排行  
 
-> **url** : `/user/download` `/user/upload` 
-`/user/collection` `/upload/new` `/upload/sort`  
+> 描述 单页最多十条数据，data为空则无数据
+
+> **url** : `/user/download/{page}` `/user/upload/{page}` 
+`/user/collection/{page}` `/upload/new/{page}` `/upload/sort/{page}`  
 
 * 访问方式： GET  
 
-> 请求参数说明：无  
+> 请求参数说明 {page} 为获取第几页 从1开始  
+
+> 请求示例 `/user/download/1`
 
 * 返回示例
 
@@ -225,6 +229,26 @@
 > |uploader_nickname|string|上传者nickname|
 > |score|Integer|下载所需积分|
 > |created_at|String|文件发布时间|   
+
+### 添加、取消收藏  
+
+> **url** : `/collection/{id}`  
+
+* 访问方式： PUT(添加) DELETE(取消)  
+
+> * 请求参数说明：无  
+
+* 返回示例  
+
+```json  
+{
+    "code":0,
+    "status":"成功",
+    "data":104
+}
+```  
+
+> * 返回参数说明：无  
 
 ## 文档  
 
@@ -337,12 +361,13 @@
 > | :----: | :---: | :---: |
 > |document|bytes|文档文件，二进制形式|  
 
-### 文档下载  
+### 文档删除  
 
-> **url** : `/download/{id}`  
+> **url** : `/document/{id}`  
 
-> 描述 无 直接打开为下载文件  
+* 访问方式： DELETE(取消)  
 
+> * 请求参数说明：id 为文件 id  
 
 * 返回示例  
 
@@ -350,31 +375,65 @@
 {
     "code":0,
     "status":"成功",
-    "data":120
+    "data":174
 }
 ```  
 
 > * 返回参数说明：无  
 
-### 添加、取消收藏  
+### 文档下载  
 
-> **url** : `/collection/{id}`  
+> 描述 直接访问为下载文件(没有权限则跳转到{待定})  
 
-* 访问方式： PUT(添加) DELETE(取消)  
+> **url** : `/download/{id}`  
 
-* 参数说明：无  
+* 访问方式： GET
 
-* 返回示例  
+> * 请求参数说明：id 为文件 id  
 
-```json
+* 返回示例：无  
+
+### 分类与搜索  
+
+> **url** : `/document/search/{page}`  
+
+* 访问方式： GET
+
+> * 请求参数说明：page 为页码  
+>   
+> |参数名|参数类型|参数解释|示例|限制|  
+> | :----: | :---: | :---: | :---: | :---: |
+> |tag|Integer|文件标签|[1,2,3,4]|数字数组 转 JSON|
+> |type|Integer|文件类型|[1,5]|数字数组 转 JSON|  
+> |keyword|Integer|关键字|["自动化","期末"]|JSON|
+
+> * 返回示例： 
+
+```json  
 {
     "code":0,
     "status":"成功",
-    "data":104
+    "data":[
+        {
+            "id":23,
+            "name":"湘大文库改版说明文档.docx",
+            "type":3,
+            "tag":"3",
+            "uploader":1,
+            "uploader_nickname":"小白",
+            "title":"湘大文科需求文档",
+            "downloads":0,
+            "description":"湘大文科需求文档~小白",
+            "score":5,
+            "size":962545,
+            "md5":"8075739a3b804ee0c316572aaabdea55",
+            "created_at":"2019-04-05 13:44:39"
+        }
+    ]
 }
 ```  
 
-> * 返回参数说明：无  
+> * 返回参数解释：无  
 
 
 # 维护说明  
@@ -415,5 +474,7 @@
 ## DEBUG  
 
 > 返回数据中 code 非0一般在data中会有一个数字 为行号 、\_\_LINE\_\_  
-> 错误日志位置  storage/logs
+> 错误日志位置  storage/logs  
+
+## 后端修复日志
 

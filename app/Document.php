@@ -4,6 +4,22 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+
+/**
+ * Class Document
+ * @property  int $id
+ * @property  int $name
+ * @property  int $type
+ * @property  int $tag
+ * @property  int $uploader
+ * @property  string $uploader_nickname
+ * @property  int $score
+ * @property  int $downloads
+ * @property  string $description
+ * @property  string $title
+ * @property  string $created_at
+ * @package App
+ */
 class Document extends Model {
     //
     protected $fillable = [

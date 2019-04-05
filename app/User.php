@@ -6,6 +6,25 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * Class User
+ * @property int $id 用户标识
+ * @property int $stu_id 学号
+ * @property int $score 积分
+ * @property string $nickname
+ * @property string $upload 上传列表
+ * @property string $download 购买列表（可下载列表）
+ * @property string $collection 收藏列表
+ * @property string $avatar 头像文件名称
+ * @property array info() 个人信息
+ * @property void addDownload(int $document_id)
+ * @property void addUpload(int $document_id)
+ * @property void delUpload(int $document_id)
+ * @property void addCollection(int $document_id)
+ * @property void delCollection(int $document_id)
+ * @property bool earnScore(int $num)
+ * @package App
+ */
 class User extends Authenticatable
 {
     use Notifiable;
@@ -16,7 +35,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'email', 'password', 'stu_id', 'nickname', 'upload', 'download', 'collection', 'avatar', 'score'
+        'password', 'stu_id', 'nickname', 'upload', 'download', 'collection', 'avatar', 'score'
     ];
 
     /**
@@ -36,6 +55,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * @return array
+     */
     public function info() {
         $info = array (
             'user_id' => $this->id,
@@ -59,6 +82,7 @@ class User extends Authenticatable
         if(in_array($document_id, $new)) {
             return; //有就算了 不影响
         }
+
         array_push($new, $document_id);
 
         $this->$key = json_encode($new);
@@ -70,7 +94,8 @@ class User extends Authenticatable
         if(!in_array($document_id, $new)) {
             return; //没有就算了 不影响
         }
-        $new = array_diff($new, [$document_id]);
+
+        $new = array_values(array_diff($new, [$document_id])); //array_diff 会把索引数组转为关联数组
 
         $this->$key = json_encode($new);
         $this->save();

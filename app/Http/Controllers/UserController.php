@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Document;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\DB;
@@ -127,6 +126,7 @@ class UserController extends Controller {
         }
     }
 
+
     public function addCollection(Request $request) {
         $user = User::query()->find(session('id'));
         if(!$user) {
@@ -147,28 +147,49 @@ class UserController extends Controller {
         return msg(0, __LINE__);
     }
 
-    public function uploadList() {
+    /** 用户上传列表
+     * @param Request $request
+     * @return string
+     */
+    public function uploadList(Request $request) {
+        $offset = $request->route('page') * 10 - 10;
+
         $user = User::query()->find(session('id'));
         $uploads = json_decode($user->upload, true);
         $upList = DB::table('documents')->whereIn('id', $uploads)
+            ->offset($offset)->limit(10)
             ->get( config('user.document_public_info') )->toArray();
 
         return msg(0, $upList);
     }
 
-    public function downloadList() {
+    /** 用户购买列表 不是下载流水
+     * @param Request $request
+     * @return string
+     */
+    public function downloadList(Request $request) {
+        $offset = $request->route('page') * 10 - 10;
+
         $user = User::query()->find(session('id'));
         $downloads = json_decode($user->download, true);
         $downloadList = DB::table('documents')->whereIn('id', $downloads)
+            ->offset($offset)->limit(10)
             ->get( config('user.document_public_info') )->toArray();
 
         return msg(0, $downloadList);
     }
 
-    public function collectionList() {
+    /** 用户收藏列表
+     * @param Request $request
+     * @return string
+     */
+    public function collectionList(Request $request) {
+        $offset = $request->route('page') * 10 - 10;
+
         $user = User::query()->find(session('id'));
         $collections = json_decode($user->collection, true);
         $collectionList = DB::table('documents')->whereIn('id', $collections)
+            ->offset($offset)->limit(10)
             ->get( config('user.document_public_info') )->toArray();
 
         return msg(0, $collectionList);

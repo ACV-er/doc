@@ -7,6 +7,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Mockery\Exception;
 
 class DocumentController extends Controller {
     /**
@@ -95,7 +96,7 @@ class DocumentController extends Controller {
     public function documentInfo(Request $request) {
         $document = Document::query()->find($request->route('id'));
         if(!$document) {
-            return msg(3, __LINE__);
+            return msg(10, '目标不存在，或已删除' . __LINE__);
         }
         $downloads = User::query()->find(session('id'))->download;
         $documents = json_decode($downloads, true);
@@ -155,7 +156,24 @@ class DocumentController extends Controller {
         } else {
             return msg(3, __LINE__);
         }
+    }
 
+    /**删除发布
+     * @param Request $request
+     * @return string
+     * @throws \Exception
+     */
+    public function delDocument(Request $request) {
+        $user = User::query()->find(session('id'));
+        $result = Document::destroy($request->route('id'));
+
+        $user->delUpload($request->route('id'));
+
+        if($result === 1) {
+            return msg(0, __LINE__);
+        } else {
+            return msg(4, __LINE__);
+        }
     }
 
     /**购买文档
@@ -206,30 +224,96 @@ class DocumentController extends Controller {
         return msg(0, '购买成功');
     }
 
+    /**文档下载
+     * @param Request $request
+     * @return string|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
     public function downloadDocument(Request $request) {
         $user = User::query()->find(session('id'));
         $document = Document::query()->find($request->route('id'));
+
+        if(!$document) {
+            return response(msg(10, "目标不存在，或已删除" . __LINE__), 200);
+        }
         if(!in_array($request->route('id') , json_decode($user->download))) {
             return msg(9, "没有下载权" . __LINE__);
         }
+
         $document->downloads += 1;
         $document->save();
         $file = storage_path() . '/document' . "/" . $document->filename;
+
         return Response::download($file, $document->name);
     }
 
-    public function newUpload() {
-        $documentList = DB::table('documents')->orderBy('updated_at', 'desc')->limit(10)
+    /**最新的十个文档
+     * @param Request $request
+     * @return string
+     */
+    public function newUpload(Request $request) {
+        $offset = $request->route('page') * 10 - 10;
+        $documentList = DB::table('documents')->orderBy('updated_at', 'desc')
+            ->offset($offset)->limit(10)
             ->get( config('user.document_public_info') )->toArray();
 
         return msg(0, $documentList);
     }
 
-    public function sortUpload() {
-        $documentList = DB::table('documents')->orderBy('downloads', 'desc')->limit(10)
+    /**下载量最高的十个文档
+     * @param Request $request
+     * @return string
+     */
+    public function sortUpload(Request $request) {
+        $offset = $request->route('page') * 10 - 10;
+        $documentList = DB::table('documents')->orderBy('downloads', 'desc')
+            ->offset($offset)->limit(10)
             ->get( config('user.document_public_info') )->toArray();
 
         return msg(0, $documentList);
     }
 
+    public function search(Request $request) {
+        $offset = $request->route('page') * 10 - 10;
+        $param = ['tag', 'type', 'keyword'];
+        if(!$request->has($param)) {
+            return msg(1, __LINE__ );
+        }
+        $data = $request->only($param);
+
+        foreach ($param as $item) {
+            $data[$item] = json_decode($data[$item], true);
+            if(!is_array($data[$item])) {
+                return msg(3, __LINE__);
+            }
+        }
+
+        $keyword = $data['keyword'];
+        if (count($keyword) > 5) {
+            return msg(3, __LINE__);
+        }
+        for ($i = 0; $i < count($keyword); $i++) {
+            $keyword[$i] = "%" . $keyword[$i] . "%";
+        }
+        for ($i = count($keyword); $i < 5; $i++) {
+            $keyword[$i] = '%_%';
+        }
+
+        $result = Document::query()->whereIn('tag', $data['tag'])
+            ->whereIn('type', $data['type'])
+            ->whereRaw(
+                "concat(`title`,`description`,`name`) like ? AND " .
+                "concat(`title`,`description`,`name`) like ? AND " .
+                "concat(`title`,`description`,`name`) like ? AND " .
+                "concat(`title`,`description`,`name`) like ? AND " .
+                "concat(`title`,`description`,`name`) like ?",
+                $keyword)
+            ->offset($offset)->limit(10)
+            ->get( config('user.document_public_info') )->toArray();
+
+        if($result) {
+            return msg(0, $result);
+        } else {
+            msg(4, __LINE__);
+        }
+    }
 }
