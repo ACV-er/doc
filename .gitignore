@@ -1,0 +1,14 @@
+/node_modules
+/public/hot
+/public/storage
+/public/uploadfolder/avatar/*
+/storage/document/*
+/storage/*.key
+/vendor
+/.idea
+.env
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
