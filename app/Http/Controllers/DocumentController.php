@@ -321,4 +321,17 @@ class DocumentController extends Controller {
             msg(4, __LINE__);
         }
     }
+
+    public function swf(Request $request) {
+        $param = ['fid', 'pn'];
+
+        $data = $request->only($param);
+        if(!is_numeric($data['fid']) || !is_numeric($data['pn'])) {
+            die("");
+        }
+        $data['pn'] += 1;
+
+        $swf = file_get_contents(public_path()."/storage/view/".$data['fid']."/".$data['pn'].".swf");
+        echo $swf;
+    }
 }

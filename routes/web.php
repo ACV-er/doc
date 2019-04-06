@@ -26,6 +26,8 @@ Route::get('/document/view/{id}', function (Request $request){
     return view('document/view', ['id' => $request->route('id')]);
 });
 
+Route::get('/swf', 'DocumentController@swf');
+
 Route::group(['middleware' => 'cookie'], function () {
     Route::post('/login', 'UserController@login');
     Route::group(['middleware' => 'loginCheck'],function (){ //登录之后允许操作
