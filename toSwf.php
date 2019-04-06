@@ -25,7 +25,7 @@ if(in_array($extension, $other_allow_extension)) {
     die("");
 }
 
-exec("/usr/bin/pdf2swf -o ". $swf_path . "/%.swf -t ". $path . "/" . $info[0] . ".pdf");
+exec("/usr/bin/pdf2swf -o ". $swf_path . "/%.swf -t ". $path . "/" . $info[0] . ".pdf -f -T 9");
 
 if(in_array($extension, $other_allow_extension)) {
     unlink($path . "/" . $info[0] . ".pdf");
