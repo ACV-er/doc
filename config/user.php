@@ -5,5 +5,5 @@ return [
 
     'document_limit' => 51200000, //50M
     'document_type' => ['pdf' => 1, 'doc' => 2, 'docx' => 3, 'txt' => 4, 'md' => 5, 'xlsx' => 6, 'ppt' => 7], //支持的文件类型
-    'document_public_info' => ['id', 'name', 'type', 'tag', 'uploader', 'uploader_nickname', 'title', 'downloads', 'description', 'score', 'size', 'md5', 'created_at']
+    'document_public_info' => ['id', 'name', 'type', 'tag', 'uploader', 'uploader_nickname', 'title', 'downloads', 'description', 'score', 'size', 'md5', 'page','created_at']
 ];

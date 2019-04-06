@@ -1,6 +1,7 @@
 <?php
 
 use \Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,9 @@ Route::get('/', function () {
 Route::get('/upload/new/{page}', 'DocumentController@newUpload')->where(["page"=>'[0-9]+']);
 Route::get('/upload/sort/{page}', 'DocumentController@sortUpload')->where(["page"=>'[0-9]+']);
 Route::get('/document/search/{page}', 'DocumentController@search')->where(["page"=>'[0-9]+']);
+Route::get('/document/view/{id}', function (Request $request){
+    return view('document/view', ['id' => $request->route('id')]);
+});
 
 Route::group(['middleware' => 'cookie'], function () {
     Route::post('/login', 'UserController@login');

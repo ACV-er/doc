@@ -30,6 +30,7 @@ class CreateDocumentsTable extends Migration {
             $table->text('description');
             $table->integer('score')->default(0);
             $table->string('md5', 65);
+            $table->integer('page')->default(-1)->comment("文档页数，-1为不可预览");
 
             $table->timestamps();
         });

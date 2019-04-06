@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property  int $downloads
  * @property  string $description
  * @property  string $title
+ * @property  string $page
  * @property  string $created_at
  * @package App
  */
@@ -38,6 +39,7 @@ class Document extends Model {
             'downloads' => $this->downloads,
             'description' => $this->description,
             'title' => $this->title,
+            'page' => $this->page,
             'created_at' => date_format($this->created_at, 'Y-m-d H:i:s'),
         );
         return $info;

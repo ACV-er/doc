@@ -7,7 +7,6 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
-use Mockery\Exception;
 
 class DocumentController extends Controller {
     /**
@@ -53,6 +52,12 @@ class DocumentController extends Controller {
                 return $file_info;
             }
         }
+
+        // 虽然此前 可能该文件并没有存入数据库 但是下面的脚本运行需要很久（3-5秒甚至更久）所以可以确保在该脚本访问服务器之前 服务器内有目标数据
+        // 如果因为特殊原因 服务运行很慢 则该脚本可能去数据库内访问不存在的数据 导致不可预览
+
+        exec("php7 " . base_path() . "/toSwf.php " . env('DB_DATABASE') . " " . env('DB_USERNAME') ." "
+            . env('DB_PASSWORD') . " " . storage_path() . "/document/" . $file_info['filename'] . " > /dev/null &");
 
         $data = array_merge($data, $file_info);
         return $data;
