@@ -24,7 +24,7 @@ class DocumentController extends Controller {
 
         // 检查数据是否完整
         if (
-            !( $request->hasFile('document') || $request->routeIs('updateDocumentInfo') )
+            !($request->hasFile('document') || $request->routeIs('updateDocumentInfo'))
             || !$request->has(array_keys($mod))
         ) {
             return msg(1, __LINE__);
@@ -36,12 +36,12 @@ class DocumentController extends Controller {
         }
 
         $file_info = array();
-        if($request->hasFile('document')) {
+        if ($request->hasFile('document')) {
             // 如下 config('user.*') 值为 \app\config\user 中 键为*的元素的值
             $file_limit = config('user.document_limit');
             $file_type = config('user.document_type');
 
-            $filename = time().rand(0, 1000);
+            $filename = time() . rand(0, 1000);
             $file_info = saveFile($request->file('document'),
                 $file_limit, //文件大小限制
                 storage_path() . '/document',
@@ -56,7 +56,7 @@ class DocumentController extends Controller {
         // 虽然此前 可能该文件并没有存入数据库 但是下面的脚本运行需要很久（3-5秒甚至更久）所以可以确保在该脚本访问服务器之前 服务器内有目标数据
         // 如果因为特殊原因 服务运行很慢 则该脚本可能去数据库内访问不存在的数据 导致不可预览
 
-        exec("php7 " . base_path() . "/toSwf.php " . env('DB_DATABASE') . " " . env('DB_USERNAME') ." "
+        exec("php7 " . base_path() . "/toSwf.php " . env('DB_DATABASE') . " " . env('DB_USERNAME') . " "
             . env('DB_PASSWORD') . " " . storage_path() . "/document/" . $file_info['filename'] . " > /dev/null &");
 
         $data = array_merge($data, $file_info);
@@ -100,7 +100,7 @@ class DocumentController extends Controller {
      */
     public function documentInfo(Request $request) {
         $document = Document::query()->find($request->route('id'));
-        if(!$document) {
+        if (!$document) {
             return msg(10, '目标不存在，或已删除' . __LINE__);
         }
         $downloads = User::query()->find(session('id'))->download;
@@ -123,7 +123,7 @@ class DocumentController extends Controller {
         $document = Document::query()->find($request->route('id'));
         $result = $document->update($data);
 
-        if($result) {
+        if ($result) {
             return msg(0, __LINE__);
         } else {
             return msg(4, "BUG！" . __LINE__);
@@ -135,7 +135,7 @@ class DocumentController extends Controller {
      * @return string
      */
     public function updateDocumentFile(Request $request) {
-        if(!$request->hasFile('document')) {
+        if (!$request->hasFile('document')) {
             return msg(3, "文件不存在" . __LINE__);
         }
 
@@ -143,7 +143,7 @@ class DocumentController extends Controller {
         $file_limit = config('user.document_limit');
         $file_type = config('user.document_type');
 
-        $filename = time().rand(0, 1000);
+        $filename = time() . rand(0, 1000);
         $file_info = saveFile($request->file('document'),
             $file_limit, //文件大小限制
             storage_path() . '/document',
@@ -156,7 +156,7 @@ class DocumentController extends Controller {
 
 
         $result = Document::query()->find($request->route('id'))->update($file_info);
-        if($result) {
+        if ($result) {
             return msg(0, __LINE__);
         } else {
             return msg(3, __LINE__);
@@ -174,7 +174,7 @@ class DocumentController extends Controller {
 
         $user->delUpload($request->route('id'));
 
-        if($result === 1) {
+        if ($result === 1) {
             return msg(0, __LINE__);
         } else {
             return msg(4, __LINE__);
@@ -187,18 +187,18 @@ class DocumentController extends Controller {
      */
     public function buyDocument(Request $request) {
         $user = User::query()->find(session('id'));
-        if(in_array($request->route('id') , json_decode($user->download))) {
+        if (in_array($request->route('id'), json_decode($user->download))) {
             return msg(8, "已拥有下载权" . __LINE__);
         }
 
         $document = Document::query()->find($request->route('id'));
         $uploader = User::query()->find($document->uploader);
 
-        if(!$user || !$document || !$uploader) {
+        if (!$user || !$document || !$uploader) {
             return msg(3, __LINE__);
         }
 
-        if( !$user->earnScore(-$document->score) ) {
+        if (!$user->earnScore(-$document->score)) {
             return msg(7, '积分不足');
         }
 
@@ -212,7 +212,7 @@ class DocumentController extends Controller {
                 'spend' => $document->score,
                 'way' => '获取文档',
                 'time' => date('Y-m-d H:i:s', time())
-            ],[
+            ], [
                 'user_id' => $uploader->id,
                 'spend' => $document->score,
                 'way' => '文档被获取',
@@ -237,10 +237,10 @@ class DocumentController extends Controller {
         $user = User::query()->find(session('id'));
         $document = Document::query()->find($request->route('id'));
 
-        if(!$document) {
+        if (!$document) {
             return response(msg(10, "目标不存在，或已删除" . __LINE__), 200);
         }
-        if(!in_array($request->route('id') , json_decode($user->download))) {
+        if (!in_array($request->route('id'), json_decode($user->download))) {
             return msg(9, "没有下载权" . __LINE__);
         }
 
@@ -259,7 +259,7 @@ class DocumentController extends Controller {
         $offset = $request->route('page') * 10 - 10;
         $documentList = DB::table('documents')->orderBy('updated_at', 'desc')
             ->offset($offset)->limit(10)
-            ->get( config('user.document_public_info') )->toArray();
+            ->get(config('user.document_public_info'))->toArray();
 
         return msg(0, $documentList);
     }
@@ -272,7 +272,7 @@ class DocumentController extends Controller {
         $offset = $request->route('page') * 10 - 10;
         $documentList = DB::table('documents')->orderBy('downloads', 'desc')
             ->offset($offset)->limit(10)
-            ->get( config('user.document_public_info') )->toArray();
+            ->get(config('user.document_public_info'))->toArray();
 
         return msg(0, $documentList);
     }
@@ -280,14 +280,14 @@ class DocumentController extends Controller {
     public function search(Request $request) {
         $offset = $request->route('page') * 10 - 10;
         $param = ['tag', 'type', 'keyword'];
-        if(!$request->has($param)) {
-            return msg(1, __LINE__ );
+        if (!$request->has($param)) {
+            return msg(1, __LINE__);
         }
         $data = $request->only($param);
 
         foreach ($param as $item) {
             $data[$item] = json_decode($data[$item], true);
-            if(!is_array($data[$item])) {
+            if (!is_array($data[$item])) {
                 return msg(3, __LINE__);
             }
         }
@@ -313,9 +313,9 @@ class DocumentController extends Controller {
                 "concat(`title`,`description`,`name`) like ?",
                 $keyword)
             ->offset($offset)->limit(10)
-            ->get( config('user.document_public_info') )->toArray();
+            ->get(config('user.document_public_info'))->toArray();
 
-        if($result) {
+        if ($result) {
             return msg(0, $result);
         } else {
             msg(4, __LINE__);
@@ -326,12 +326,12 @@ class DocumentController extends Controller {
         $param = ['fid', 'pn'];
 
         $data = $request->only($param);
-        if(!is_numeric($data['fid']) || !is_numeric($data['pn'])) {
+        if (!is_numeric($data['fid']) || !is_numeric($data['pn'])) {
             die("");
         }
         $data['pn'] += 1;
 
-        $swf = file_get_contents(public_path()."/storage/view/".$data['fid']."/".$data['pn'].".swf");
+        $swf = file_get_contents(public_path() . "/storage/view/" . $data['fid'] . "/" . $data['pn'] . ".swf");
         echo $swf;
     }
 }
