@@ -8,7 +8,7 @@
     <param name="bgcolor" value="#FFFFFF">
     <param name="allowscriptaccess" value="always">
     <param name="movie" value="/storage/view/reader.swf">
-    <param name="flashvars" value="totalpages=20&amp;docurl=/swf/?fid={{ $fid }}">
+    <param name="flashvars" value="totalpages={{ $page }}&amp;docurl=/swf/?fid={{ $fid }}">
 </object>
 </body>
 </html>

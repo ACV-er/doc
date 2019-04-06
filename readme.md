@@ -185,6 +185,8 @@
             "score":5,
             "size":962545,
             "md5":"8075739a3b804ee0c316572aaabdea55",
+            "page":20,
+            "filename":"1554562783809.docx",
             "created_at":"2019-04-03 02:44:33"
         },
         {
@@ -200,6 +202,8 @@
             "score":5,
             "size":962545,
             "md5":"8075739a3b804ee0c316572aaabdea55",
+            "page":20,
+            "filename":"1554562783809.docx",
             "created_at":"2019-04-03 02:44:33"
         }
     ]
@@ -227,6 +231,8 @@
 > |uploader|Integer|上传者id|
 > |uploader_nickname|string|上传者nickname|
 > |score|Integer|下载所需积分|
+> |page|Integer|文档页码|
+> |filename|String|文档文件存储名|
 > |created_at|String|文件发布时间|   
 
 ### 添加、取消收藏  
@@ -305,6 +311,8 @@
         "downloads":0,
         "description":"湘大文科需求文档",
         "title":"湘大文科需求文档",
+        "page":20,
+        "filename":"1554562783809.docx",
         "created_at":"2019-04-03 02:44:30",
         "buy":false
     }
@@ -319,7 +327,9 @@
 > |uploader_nickname|string|上传者nickname|
 > |score|Integer|下载所需积分|  
 > |buy|bool|是否已购买|
-> |created_at|String|文件发布时间|  
+> |page|Integer|文档页码|
+> |filename|String|文档文件存储名|
+> |created_at|String|文件发布时间|   
 
 ### 文档信息更新  
 
@@ -425,6 +435,8 @@
             "description":"湘大文科需求文档~小白",
             "score":5,
             "size":962545,
+            "page":20,
+            "filename":"1554562783809.docx",
             "md5":"8075739a3b804ee0c316572aaabdea55",
             "created_at":"2019-04-05 13:44:39"
         }
@@ -433,3 +445,26 @@
 ```  
 
 > * 返回参数解释：无  
+
+### 文档预览  
+
+> 描述：跳转至该链接
+
+* **url** : `/document/view/{id}`  
+
+> 代码
+
+```html  
+<object width="100%" height="100%" align="middle" style="hide-focus: expression(this.hideFocus=true); outline: none;">
+    <param name="loop" value="true">
+    <param name="allowfullscreen" value="true">
+    <param name="allowsearch" value="fales">
+    <param name="wmode" value="opaque">
+    <param name="bgcolor" value="#FFFFFF">
+    <param name="allowscriptaccess" value="always">
+    <param name="movie" value="/storage/view/reader.swf">
+    <param name="flashvars" value="totalpages={{ $page }}&amp;docurl=/swf/?fid={{ $fid }}">
+</object>
+```  
+
+> 其中page为文档信息中的 page 即页数 fid 为 文档文件filename去除后缀

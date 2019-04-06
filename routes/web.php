@@ -23,9 +23,10 @@ Route::get('/upload/new/{page}', 'DocumentController@newUpload')->where(["page"=
 Route::get('/upload/sort/{page}', 'DocumentController@sortUpload')->where(["page"=>'[0-9]+']);
 Route::get('/document/search/{page}', 'DocumentController@search')->where(["page"=>'[0-9]+']);
 Route::get('/document/view/{id}', function (Request $request){
-    $name = \App\Document::query()->find($request->route('id'))->filename;
-    $fid = preg_split("/\./", $name)[0];
-    return view('document/view', ['fid' => $fid]);
+    $document = \App\Document::query()->find($request->route('id'));
+    $fid = preg_split("/\./", $document->filename)[0];
+    $page = $document->page;
+    return view('document/view', ['fid' => $fid, 'page' => $page]);
 });
 
 Route::get('/swf', 'DocumentController@swf');

@@ -31,6 +31,7 @@ class Document extends Model {
         $info = array(
             'id' => $this->id,
             'name' => $this->name,
+            'filename' => $this->filename,
             'type' => $this->type,
             'tag' => $this->tag,
             'uploader' => $this->uploader,
