@@ -318,7 +318,7 @@ class DocumentController extends Controller {
         if ($result) {
             return msg(0, $result);
         } else {
-            msg(4, __LINE__);
+            return msg(4, __LINE__);
         }
     }
 
