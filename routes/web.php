@@ -61,4 +61,3 @@ Route::group(['middleware' => 'cookie'], function () {
         Route::get('/download/{id}', 'DocumentController@downloadDocument')->where(["id"=>'[0-9]+'])->name('download');
     });
 });
-
