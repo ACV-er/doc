@@ -448,23 +448,16 @@
 
 ### 文档预览  
 
-> 描述：跳转至该链接
+> 描述：返回图片 为该文章的一页  
 
-* **url** : `/document/view/{id}`  
+* **url** : `/document/view/{id}/{page}`  
 
-> 代码
+* 访问方式： GET  
 
-```html  
-<object width="100%" height="100%" align="middle" style="hide-focus: expression(this.hideFocus=true); outline: none;">
-    <param name="loop" value="true">
-    <param name="allowfullscreen" value="true">
-    <param name="allowsearch" value="fales">
-    <param name="wmode" value="opaque">
-    <param name="bgcolor" value="#FFFFFF">
-    <param name="allowscriptaccess" value="always">
-    <param name="movie" value="/storage/view/reader.swf">
-    <param name="flashvars" value="totalpages={{ $page }}&amp;docurl=/swf/?fid={{ $fid }}">
-</object>
-```  
+> * 请求参数说明：  
+>   
+> |参数名|参数类型|参数解释|  
+> | :----: | :---: | :---: |
+> |id|Integer|文章id|
+> |page|Integer|页码|
 
-> 其中page为文档信息中的 page 即页数 fid 为 文档文件filename去除后缀

@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Document;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Response;
 
 class DocumentController extends Controller {
     /**
@@ -56,7 +56,7 @@ class DocumentController extends Controller {
         // 虽然此前 可能该文件并没有存入数据库 但是下面的脚本运行需要很久（3-5秒甚至更久）所以可以确保在该脚本访问服务器之前 服务器内有目标数据
         // 如果因为特殊原因 服务运行很慢 则该脚本可能去数据库内访问不存在的数据 导致不可预览
 
-        exec("php7 " . base_path() . "/toSwf.php " . env('DB_DATABASE') . " " . env('DB_USERNAME') . " "
+        exec("php7 " . base_path() . "/toJpg.php " . env('DB_DATABASE') . " " . env('DB_USERNAME') . " "
             . env('DB_PASSWORD') . " " . storage_path() . "/document/" . $file_info['filename'] . " > /dev/null &");
 
         $data = array_merge($data, $file_info);
@@ -322,16 +322,18 @@ class DocumentController extends Controller {
         }
     }
 
-    public function swf(Request $request) {
-        $param = ['fid', 'pn'];
-
-        $data = $request->only($param);
-        if (!is_numeric($data['fid']) || !is_numeric($data['pn'])) {
-            die("");
+    public function getJpg(Request $request) {
+        $document = Document::query()->find($request->route('id'));
+        if(!$document || $request->route('page') > $document->page) {
+            return response(msg(10, "目标不存在，或已删除" . __LINE__), 200);
         }
-        $data['pn'] += 1;
+        
+        $path = public_path()."/storage/view/".preg_split("/\./", $document->filename)[0];
+        $page = $request->route('page') - 1;
+        $jpg = "$path/1-$page.jpg";
 
-        $swf = file_get_contents(public_path() . "/storage/view/" . $data['fid'] . "/" . $data['pn'] . ".swf");
-        echo $swf;
+        header("Content-type: image/jpeg");
+        echo file_get_contents($jpg);
+
     }
 }

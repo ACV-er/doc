@@ -1,7 +1,6 @@
 <?php
 
 use \Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,15 +21,9 @@ Route::get('/', function () {
 Route::get('/upload/new/{page}', 'DocumentController@newUpload')->where(["page"=>'[0-9]+']);
 Route::get('/upload/sort/{page}', 'DocumentController@sortUpload')->where(["page"=>'[0-9]+']);
 Route::get('/document/search/{page}', 'DocumentController@search')->where(["page"=>'[0-9]+']);
-Route::get('/document/view/{id}', function (Request $request){
-    $document = \App\Document::query()->find($request->route('id'));
-    if(!$document) {
-        return response(msg(10, "目标不存在，或已删除" . __LINE__), 200);
-    }
-    $fid = preg_split("/\./", $document->filename)[0];
-    $page = $document->page;
-    return view('document/view', ['fid' => $fid, 'page' => $page]);
-});
+
+Route::get('/document/view/{id}/{page}', 'DocumentController@getJpg')
+    ->where(["id"=>'[0-9]+'])->where(["page"=>'[0-9]+']);
 
 Route::get('/swf', 'DocumentController@swf');
 

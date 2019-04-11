@@ -12,10 +12,10 @@ $path = dirname($scr_file);
 // 文件名以及拓展名分离数组
 $info = preg_split("/\./", $filename);
 
-$swf_path = getcwd()."/storage/view/" . $info[0];
+$jpg_path = getcwd()."/storage/view/" . $info[0];
 
-if(!file_exists($swf_path)) {
-    mkdir($swf_path);
+if(!file_exists($jpg_path)) {
+    mkdir($jpg_path);
 }
 
 $extension = $info[1];
@@ -25,13 +25,14 @@ if(in_array($extension, $other_allow_extension)) {
     die("");
 }
 
-exec("/usr/bin/pdf2swf -o ". $swf_path . "/%.swf -t ". $path . "/" . $info[0] . ".pdf -f -T 9");
+
+exec("/usr/bin/convert $path/$info[0].pdf $jpg_path/1.jpg");
 
 if(in_array($extension, $other_allow_extension)) {
     unlink($path . "/" . $info[0] . ".pdf");
 }
 
-$count = system("ls " . $swf_path . " -l | grep \"^-\" | wc -l");
+$count = system("ls " . $jpg_path . " -l | grep \"^-\" | wc -l");
 
 $conn = new PDO("mysql:host=localhost;dbname=$DB_DATABASE", $DB_USERNAME, $DB_PASSWORD);
 
