@@ -244,8 +244,10 @@ class DocumentController extends Controller {
             return msg(9, "没有下载权" . __LINE__);
         }
 
+        // 增加下载量
         $document->downloads += 1;
         $document->save();
+
         $file = storage_path() . '/document' . "/" . $document->filename;
 
         return Response::download($file, $document->name);
@@ -277,14 +279,20 @@ class DocumentController extends Controller {
         return msg(0, $documentList);
     }
 
+    /** 最多五个关键字
+     * @param Request $request
+     * @return string
+     */
     public function search(Request $request) {
         $offset = $request->route('page') * 10 - 10;
+
         $param = ['tag', 'type', 'keyword'];
         if (!$request->has($param)) {
             return msg(1, __LINE__);
         }
         $data = $request->only($param);
 
+        // 取出参数, 均为数组
         foreach ($param as $item) {
             $data[$item] = json_decode($data[$item], true);
             if (!is_array($data[$item])) {
@@ -292,6 +300,8 @@ class DocumentController extends Controller {
             }
         }
 
+        // 构造 %关键字% 格式
+        //  该形式 %?% ?无法被解析为占位符
         $keyword = $data['keyword'];
         if (count($keyword) > 5) {
             return msg(3, __LINE__);
@@ -299,10 +309,13 @@ class DocumentController extends Controller {
         for ($i = 0; $i < count($keyword); $i++) {
             $keyword[$i] = "%" . $keyword[$i] . "%";
         }
+
+        // 关键词不够则使用通配符 %_%
         for ($i = count($keyword); $i < 5; $i++) {
             $keyword[$i] = '%_%';
         }
 
+        // 关键词搜索 看代码
         $result = Document::query()->whereIn('tag', $data['tag'])
             ->whereIn('type', $data['type'])
             ->whereRaw(
@@ -322,18 +335,22 @@ class DocumentController extends Controller {
         }
     }
 
+    /**
+     * @param Request $request
+     * @return false|string string可能为图片内容
+     */
     public function getJpg(Request $request) {
         $document = Document::query()->find($request->route('id'));
         if(!$document || $request->route('page') > $document->page) {
             return response(msg(10, "目标不存在，或已删除" . __LINE__), 200);
         }
-        
+
         $path = public_path()."/storage/view/".preg_split("/\./", $document->filename)[0];
         $page = $request->route('page') - 1;
         $jpg = "$path/1-$page.jpg";
 
         header("Content-type: image/jpeg");
-        echo file_get_contents($jpg);
 
+        return file_get_contents($jpg);
     }
 }
