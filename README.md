@@ -9,6 +9,16 @@
 
 > laravel  
 
+## 依赖  
+
+> libreoffice xpdf swftools  
+> (libreoffice 将其他文档转为pdf swftools 将pdf转为swf文件 xpdf貌似似是依赖)  
+> libreoffice 需要给执行者一个HOME目录 建立/home/*username*目录  
+
+```  
+/usr/bin/libreoffice6.0 --headless --invisible --convert-to pdf /tmp/123.docx --outdir /tmp
+```  
+
 ## 数据库  
 
 > 见 .env 文件  **DB_DATABASE**  
