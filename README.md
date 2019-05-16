@@ -16,7 +16,7 @@
 > libreoffice 需要给执行者一个HOME目录 建立/home/*username*目录  
 
 ```  
-/usr/bin/libreoffice6.0 --headless --invisible --convert-to pdf /tmp/123.docx --outdir /tmp
+// 具体见 /toJpg.php 脚本
 ```  
 
 ## 数据库  

@@ -4,7 +4,7 @@ $DB_DATABASE = $argv[1];
 $DB_USERNAME = $argv[2];
 $DB_PASSWORD = $argv[3];
 $scr_file = $argv[4];
-$other_allow_extension = ["doc", "pptx", "docx", "xlsx"]; //pdf直接转 swf 这些文件先转pdf
+$other_allow_extension = ["doc", "pptx", "docx", "xlsx", "xls"]; //pdf直接转 swf 这些文件先转pdf
 
 $filename = basename($scr_file);
 $path = dirname($scr_file);
@@ -26,7 +26,7 @@ if(in_array($extension, $other_allow_extension)) {
 }
 
 
-exec("/usr/bin/convert $path/$info[0].pdf $jpg_path/1.jpg");
+exec("/usr/bin/convert -alpha remove $path/$info[0].pdf $jpg_path/1.jpg");
 
 if(in_array($extension, $other_allow_extension)) {
     unlink($path . "/" . $info[0] . ".pdf");
