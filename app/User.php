@@ -17,12 +17,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string $collection 收藏列表
  * @property string $avatar 头像文件名称
  * @property array info() 个人信息
- * @property void addDownload(int $document_id)
- * @property void addUpload(int $document_id)
- * @property void delUpload(int $document_id)
- * @property void addCollection(int $document_id)
- * @property void delCollection(int $document_id)
- * @property bool earnScore(int $num)
+ * @property void addDownload(int $document_id) 增加用户可下载文件
+ * @property void addUpload(int $document_id) 增加用户上传
+ * @property void delUpload(int $document_id) 删除某个上传
+ * @property void addCollection(int $document_id) 收藏
+ * @property void delCollection(int $document_id) 取消收藏
+ * @property bool earnScore(int $num) 判定用户积分是否够用
  * @package App
  */
 class User extends Authenticatable
@@ -101,7 +101,7 @@ class User extends Authenticatable
         $this->save();
     }
 
-    /**积分变化
+    /**判断积分是否够用
      * @param int $num 变化的值，消耗即为负
      * @return bool 积分不够返回false
      */
@@ -110,9 +110,6 @@ class User extends Authenticatable
             return false;
         }
 
-        $this->score += $num;
-        $this->save();
-
         return true;
     }
 
@@ -120,6 +117,7 @@ class User extends Authenticatable
         $this->addDocument('download', $document_id);
     }
     //下载(购买)后不可删除
+    // 没有delDownload
 
     public function addUpload(int $document_id) {
         $this->addDocument('upload', $document_id);

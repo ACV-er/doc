@@ -163,7 +163,7 @@ class UserController extends Controller {
         return msg(0, $upList);
     }
 
-    /** 用户购买列表 不是下载流水
+    /** 用户可下载列表 不是下载流水
      * @param Request $request
      * @return string
      */

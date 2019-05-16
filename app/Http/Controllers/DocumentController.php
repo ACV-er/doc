@@ -166,7 +166,6 @@ class DocumentController extends Controller {
     /**删除发布
      * @param Request $request
      * @return string
-     * @throws \Exception
      */
     public function delDocument(Request $request) {
         $user = User::query()->find(session('id'));
@@ -198,35 +197,48 @@ class DocumentController extends Controller {
             return msg(3, __LINE__);
         }
 
+        // 判断购买者积分是否够用
         if (!$user->earnScore(-$document->score)) {
             return msg(7, '积分不足');
         }
 
-        $user->addDownload($request->route('id'));
-        $uploader->earnScore($document->score);
 
-        //记录流水
-        DB::table('scores')->insert([
-            [
+        // 事务处理，防止误扣分或误加分
+        DB::transaction(function () use /*外部变量作用到闭包*/ ($user, $document, $uploader) {
+
+            // 积分交易
+            DB::table('users')->where('id', $user->id)
+                ->decrement('score', $document->score);
+            DB::table('users')->where('id', $uploader)
+                ->increment('score', $document->score);
+
+            //记录流水，加入事务处理
+            DB::table('scores')->insert([
+                [
+                    'user_id' => $user->id,
+                    'spend' => $document->score,
+                    'way' => '获取文档',
+                    'time' => date('Y-m-d H:i:s', time())
+                ], [
+                    'user_id' => $uploader->id,
+                    'spend' => $document->score,
+                    'way' => '文档被获取',
+                    'time' => date('Y-m-d H:i:s', time())
+                ]
+            ]);
+            DB::table('buys')->insert([
                 'user_id' => $user->id,
                 'spend' => $document->score,
-                'way' => '获取文档',
+                'document_id' => $document->id,
                 'time' => date('Y-m-d H:i:s', time())
-            ], [
-                'user_id' => $uploader->id,
-                'spend' => $document->score,
-                'way' => '文档被获取',
-                'time' => date('Y-m-d H:i:s', time())
-            ]
-        ]);
-        DB::table('buys')->insert([
-            'user_id' => $user->id,
-            'spend' => $document->score,
-            'document_id' => $document->id,
-            'time' => date('Y-m-d H:i:s', time())
-        ]);
+            ]);
 
-        return msg(0, '购买成功');
+            // 事务处理完成，赋予下载权，该操作没有加入到该事务，按照业务逻辑，这个步骤不存在出错可能
+            $user->addDownload($document->id);
+            return msg(0, '购买成功');
+        });
+
+        return msg(5, '购买失败' . __LINE__);
     }
 
     /**文档下载
@@ -292,7 +304,7 @@ class DocumentController extends Controller {
         }
         $data = $request->only($param);
 
-        // 取出参数, 均为数组
+        // 取出参数, 均为数组，否则报错
         foreach ($param as $item) {
             $data[$item] = json_decode($data[$item], true);
             if (!is_array($data[$item])) {
@@ -301,7 +313,7 @@ class DocumentController extends Controller {
         }
 
         // 构造 %关键字% 格式
-        //  该形式 %?% ?无法被解析为占位符
+        // 若预编译写为 %?% ?无法被解析为占位符
         $keyword = $data['keyword'];
         if (count($keyword) > 5) {
             return msg(3, __LINE__);
@@ -310,12 +322,12 @@ class DocumentController extends Controller {
             $keyword[$i] = "%" . $keyword[$i] . "%";
         }
 
-        // 关键词不够则使用通配符 %_%
+        // 关键词不够则使用通配符 %_% 添补
         for ($i = count($keyword); $i < 5; $i++) {
             $keyword[$i] = '%_%';
         }
 
-        // 关键词搜索 看代码
+        // 关键词搜索 看代码，写死为5个
         $result = Document::query()->whereIn('tag', $data['tag'])
             ->whereIn('type', $data['type'])
             ->whereRaw(
@@ -341,11 +353,11 @@ class DocumentController extends Controller {
      */
     public function getJpg(Request $request) {
         $document = Document::query()->find($request->route('id'));
-        if(!$document || $request->route('page') > $document->page) {
+        if (!$document || $request->route('page') > $document->page) {
             return response(msg(10, "目标不存在，或已删除" . __LINE__), 200);
         }
 
-        $path = public_path()."/storage/view/".preg_split("/\./", $document->filename)[0];
+        $path = public_path() . "/storage/view/" . preg_split("/\./", $document->filename)[0];
         $page = $request->route('page') - 1;
         $jpg = "$path/1-$page.jpg";
 
