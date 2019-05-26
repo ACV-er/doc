@@ -12,7 +12,7 @@
 ## 依赖  
 
 > libreoffice convert  
-> (libreoffice 将其他文档转为pdf convert 将pdf转为jpg文件)  
+> (libreoffice 将其他文档转为pdf convert 将pdf转为swf文件 xpdf貌似似是依赖)  
 > libreoffice 需要给执行者一个HOME目录 建立/home/*username*目录(为php所有者)  
 
 ```  
