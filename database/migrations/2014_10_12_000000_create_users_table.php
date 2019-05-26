@@ -28,6 +28,7 @@ class CreateUsersTable extends Migration
             $table->json('upload')->default(NULL);
             $table->json('collection')->default(NULL);
             $table->json('recourse')->default(NULL);
+            $table->json('accept')->default(NULL);
 
             $table->timestamps();
         });
