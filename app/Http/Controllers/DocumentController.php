@@ -238,7 +238,7 @@ class DocumentController extends Controller {
             return msg(0, '购买成功');
         });
 
-        return msg(5, '购买失败' . __LINE__);
+        return msg(4, '购买失败' . __LINE__);
     }
 
     /**文档下载

@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
@@ -17,16 +16,15 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string $collection 收藏列表
  * @property string $avatar 头像文件名称
  * @property array info() 个人信息
- * @property void addDownload(int $document_id) 增加用户可下载文件
- * @property void addUpload(int $document_id) 增加用户上传
- * @property void delUpload(int $document_id) 删除某个上传
- * @property void addCollection(int $document_id) 收藏
- * @property void delCollection(int $document_id) 取消收藏
- * @property bool earnScore(int $num) 判定用户积分是否够用
+ * @property void addDownload($document_id) 增加用户可下载文件
+ * @property void addUpload($document_id) 增加用户上传
+ * @property void delUpload($document_id) 删除某个上传
+ * @property void addCollection($document_id) 收藏
+ * @property void delCollection($document_id) 取消收藏
+ * @property bool earnScore($num) 判定用户积分是否够用
  * @package App
  */
-class User extends Authenticatable
-{
+class User extends Authenticatable {
     use Notifiable;
 
     /**
@@ -60,7 +58,7 @@ class User extends Authenticatable
      * @return array
      */
     public function info() {
-        $info = array (
+        $info = array(
             'user_id' => $this->id,
             'stu_id' => $this->stu_id,
             'nickname' => $this->nickname,
@@ -79,7 +77,7 @@ class User extends Authenticatable
      */
     private function addDocument($key, int $document_id) {
         $new = json_decode($this->$key, true);
-        if(in_array($document_id, $new)) {
+        if (in_array($document_id, $new)) {
             return; //有就算了 不影响
         }
 
@@ -91,7 +89,7 @@ class User extends Authenticatable
 
     private function delDocument($key, int $document_id) {
         $new = json_decode($this->$key, true);
-        if(!in_array($document_id, $new)) {
+        if (!in_array($document_id, $new)) {
             return; //没有就算了 不影响
         }
 
@@ -106,7 +104,7 @@ class User extends Authenticatable
      * @return bool 积分不够返回false
      */
     public function earnScore(int $num) {
-        if($this->score + $num < 0) {
+        if ($this->score + $num < 0) {
             return false;
         }
 

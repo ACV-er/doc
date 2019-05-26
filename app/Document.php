@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property  string $title
  * @property  string $page
  * @property  string $created_at
+ * @property array info() 文档信息
  * @package App
  */
 class Document extends Model {
