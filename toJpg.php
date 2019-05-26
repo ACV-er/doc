@@ -33,7 +33,9 @@ if(in_array($extension, $other_allow_extension)) {
 }
 
 $count = system("ls " . $jpg_path . " -l | grep \"^-\" | wc -l");
-
+if($count == 1) {
+    exec("mv ".$jpg_path."/1.jpg ".$jpg_path."/1-0.jpg ");
+}
 $conn = new PDO("mysql:host=localhost;dbname=$DB_DATABASE", $DB_USERNAME, $DB_PASSWORD);
 
 $conn->exec("UPDATE `documents` SET page=$count WHERE filename='$filename'");
