@@ -21,14 +21,13 @@ class CreateUsersTable extends Migration
             $table->string('password');
 
             $table->string('email')->unique()->nullable();
-
             $table->string('avatar', 30)->default("default.jpg");
-
             $table->unsignedInteger('score')->default(0);
 
-            $table->string('download', 2000)->default('[]');
-            $table->string('upload', 2000)->default('[]');
-            $table->string('collection', 2000)->default('[]');
+            $table->json('download')->default('[]');
+            $table->json('upload')->default('[]');
+            $table->json('collection')->default('[]');
+            $table->json('recourse');
 
             $table->timestamps();
         });
