@@ -11,9 +11,9 @@
 
 ## 依赖  
 
-> libreoffice xpdf swftools  
-> (libreoffice 将其他文档转为pdf swftools 将pdf转为swf文件 xpdf貌似似是依赖)  
-> libreoffice 需要给执行者一个HOME目录 建立/home/*username*目录  
+> libreoffice convert  
+> (libreoffice 将其他文档转为pdf convert 将pdf转为swf文件 xpdf貌似似是依赖)  
+> libreoffice 需要给执行者一个HOME目录 建立/home/*username*目录(为php所有者)  
 
 ```  
 // 具体见 /toJpg.php 脚本
