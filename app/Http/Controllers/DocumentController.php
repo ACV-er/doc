@@ -327,7 +327,7 @@ class DocumentController extends Controller {
             $keyword[$i] = '%_%';
         }
 
-        // 关键词搜索 看代码，写死为5个
+        // 关键词搜索 看代码，关键词数写死为5个, 前端只需要传递不超过5个即可
         $result = Document::query()->whereIn('tag', $data['tag'])
             ->whereIn('type', $data['type'])
             ->whereRaw(
