@@ -28,7 +28,7 @@ Route::get('/document/view/{id}/{page}', 'DocumentController@getJpg')
 Route::get('/swf', 'DocumentController@swf');
 
 Route::group(['middleware' => 'cookie'], function () {
-    Route::post('/login', 'UserController@login');
+    Route::post('/login', 'UserController@login')->middleware('recourseExpired');  // 中间件用来检测过期求助
     Route::group(['middleware' => 'loginCheck'],function (){ //登录之后允许操作
 
         Route::get('/user/info', 'UserController@getUserInfo');
@@ -38,16 +38,24 @@ Route::group(['middleware' => 'cookie'], function () {
         Route::get('/user/upload/{page}', 'UserController@uploadList')->where(["page"=>'[0-9]+']);
         Route::get('/user/download/{page}', 'UserController@downloadList')->where(["page"=>'[0-9]+']);
         Route::get('/user/collection/{page}', 'UserController@collectionList')->where(["page"=>'[0-9]+']);
+        Route::get('/user/recourse/{page}', 'UserController@recourseList')->where(["page"=>'[0-9]+']);
 
         Route::put('/collection/{id}', 'UserController@addCollection')->where(["id"=>'[0-9]+']);
         Route::delete('/collection/{id}', 'UserController@delCollection')->where(["id"=>'[0-9]+']);
 
         Route::put('/document', 'DocumentController@upload');
         Route::get('/document/info/{id}', 'DocumentController@documentInfo')->where(["id"=>'[0-9]+']);
-        Route::group(['middleware' => 'ownership'], function () { // 验证所有权
-            Route::post('/document/{id}', 'DocumentController@updateDocumentFile');
+        Route::group(['middleware' => 'docuOwnerShip'], function () { // 验证所有权
+            Route::post('/document/{id}', 'DocumentController@updateDocumentFile')->where(["id"=>'[0-9]+']);
             Route::post('/document/info/{id}', 'DocumentController@updateDocumentInfo')->where(["id"=>'[0-9]+'])->name('updateDocumentInfo');
             Route::delete('/document/{id}', 'DocumentController@delDocument')->where(["id"=>'[0-9]+']);
+        });
+
+        Route::put("/recourse", 'RecourseController@submit');
+        Route::group(['middleware' => 'recoOwnerShip'], function () { // 验证所有权
+            Route::post('/recourse/{id}', 'RecourseController@update')->where(["id"=>'[0-9]+']);
+            Route::delete('/recourse/{id}', 'RecourseController@delete')->where(["id"=>'[0-9]+']);
+            Route::post('/recourse/finish/{id}', 'RecourseController@finish')->where(["id"=>'[0-9]+']);
         });
 
         Route::get('/buy/{id}', 'DocumentController@buyDocument')->where(["id"=>'[0-9]+']);

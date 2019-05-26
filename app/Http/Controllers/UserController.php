@@ -198,4 +198,20 @@ class UserController extends Controller {
 
         return msg(0, $collectionList);
     }
+
+    /** 用户求助列表
+     * @param Request $request
+     * @return string
+     */
+    public function recourseList(Request $request) {
+        $offset = $request->route('page') * 10 - 10;
+
+        $user = User::query()->find(session('id'));
+        $recourses = json_decode($user->recourse, true);
+        $recourseList = DB::table('recourses')->whereIn('id', $recourses)
+            ->offset($offset)->limit(10)
+            ->get()->toArray();
+
+        return msg(0, $recourseList);
+    }
 }
