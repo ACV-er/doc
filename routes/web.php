@@ -57,7 +57,7 @@ Route::group(['middleware' => 'cookie'], function () {
         Route::group(['middleware' => 'recoOwnerShip'], function () { // 验证所有权
             Route::post('/recourse/{id}', 'RecourseController@update')->where(["id"=>'[0-9]+']);
             Route::delete('/recourse/{id}', 'RecourseController@delete')->where(["id"=>'[0-9]+']);
-            Route::post('/recourse/finish/{id}', 'RecourseController@finish')->where(["id"=>'[0-9]+']);
+            Route::post('/recourse/accept/{id}', 'RecourseController@accept')->where(["id"=>'[0-9]+']);
         });
 
         Route::get('/buy/{id}', 'DocumentController@buyDocument')->where(["id"=>'[0-9]+']);
