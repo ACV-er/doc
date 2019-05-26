@@ -63,7 +63,7 @@ class Kernel extends HttpKernel
         'cookie' => \App\Http\Middleware\Cookie::class,
         'loginCheck' => \App\Http\Middleware\LoginCheck::class,
         'docuOwnerShip' => \App\Http\Middleware\DocuOwnerShip::class,
-        'recourseExpired' => \App\Http\Middleware\RecourseExpired::class,
+        'recourse' => \App\Http\Middleware\Recourse::class,
         'recoOwnerShip' => \App\Http\Middleware\RecoOwnerShip::class,
     ];
 

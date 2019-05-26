@@ -28,7 +28,7 @@ Route::get('/document/view/{id}/{page}', 'DocumentController@getJpg')
 Route::get('/swf', 'DocumentController@swf');
 
 Route::group(['middleware' => 'cookie'], function () {
-    Route::post('/login', 'UserController@login')->middleware('recourseExpired');  // 中间件用来检测过期求助
+    Route::post('/login', 'UserController@login')->middleware('recourse');  // 中间件用来检测过期求助，以及解答被采纳的积分赠与
     Route::group(['middleware' => 'loginCheck'],function (){ //登录之后允许操作
 
         Route::get('/user/info', 'UserController@getUserInfo');
@@ -51,7 +51,9 @@ Route::group(['middleware' => 'cookie'], function () {
             Route::delete('/document/{id}', 'DocumentController@delDocument')->where(["id"=>'[0-9]+']);
         });
 
-        Route::put("/recourse", 'RecourseController@submit');
+        Route::post('/recourse/solution/{recourse_id}')->where(["id"=>'[0-9]+', "recourse_id"=>'[0-9]+']);
+
+        Route::put("/recourse", 'RecourseController@release');
         Route::group(['middleware' => 'recoOwnerShip'], function () { // 验证所有权
             Route::post('/recourse/{id}', 'RecourseController@update')->where(["id"=>'[0-9]+']);
             Route::delete('/recourse/{id}', 'RecourseController@delete')->where(["id"=>'[0-9]+']);
