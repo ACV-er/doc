@@ -24,10 +24,10 @@ class CreateUsersTable extends Migration
             $table->string('avatar', 30)->default("default.jpg");
             $table->unsignedInteger('score')->default(0);
 
-            $table->json('download')->default('[]');
-            $table->json('upload')->default('[]');
-            $table->json('collection')->default('[]');
-            $table->json('recourse')->default('[]');
+            $table->json('download')->default(NULL);
+            $table->json('upload')->default(NULL);
+            $table->json('collection')->default(NULL);
+            $table->json('recourse')->default(NULL);
 
             $table->timestamps();
         });
