@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use App\Document;
 use Closure;
 
-class OwnerShip
+class DocuOwnerShip
 {
     /**
      * Handle an incoming request.
