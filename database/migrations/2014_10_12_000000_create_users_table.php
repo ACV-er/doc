@@ -27,7 +27,7 @@ class CreateUsersTable extends Migration
             $table->json('download')->default('[]');
             $table->json('upload')->default('[]');
             $table->json('collection')->default('[]');
-            $table->json('recourse');
+            $table->json('recourse')->default('[]');
 
             $table->timestamps();
         });
