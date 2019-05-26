@@ -22,14 +22,11 @@ Route::get('/upload/new/{page}', 'DocumentController@newUpload')->where(["page"=
 Route::get('/upload/sort/{page}', 'DocumentController@sortUpload')->where(["page"=>'[0-9]+']);
 Route::get('/document/search/{page}', 'DocumentController@search')->where(["page"=>'[0-9]+']);
 
-<<<<<<< HEAD
 Route::get('/document/view/{id}/{page}', 'DocumentController@getJpg')
     ->where(["id"=>'[0-9]+'])->where(["page"=>'[0-9]+']);
 
 Route::get('/swf', 'DocumentController@swf');
 
-=======
->>>>>>> ac160807170520091ad647049f8e571ed0233018
 Route::group(['middleware' => 'cookie'], function () {
     Route::post('/login', 'UserController@login');
     Route::group(['middleware' => 'loginCheck'],function (){ //登录之后允许操作
@@ -57,7 +54,3 @@ Route::group(['middleware' => 'cookie'], function () {
         Route::get('/download/{id}', 'DocumentController@downloadDocument')->where(["id"=>'[0-9]+'])->name('download');
     });
 });
-<<<<<<< HEAD
-=======
-
->>>>>>> ac160807170520091ad647049f8e571ed0233018
