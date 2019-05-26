@@ -361,8 +361,7 @@ class DocumentController extends Controller {
         $page = $request->route('page') - 1;
         $jpg = "$path/1-$page.jpg";
 
-        header("Content-type: image/jpeg");
-
-        return file_get_contents($jpg);
+        return response(file_get_contents($jpg), 200)
+            ->header('Content-Type', 'image/jpeg');
     }
 }
