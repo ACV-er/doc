@@ -81,14 +81,18 @@ class RecourseController extends Controller {
     }
 
     public function update(Request $request) {
+        // 若已解决，无法更改
+        $recourse = Recourse::query()->find($request->route('id'));
+        if($recourse->helper != -1) {
+            return msg(3, __LINE__);
+        }
+
         $data = $this->handleData($request);
         if (is_string($data)) {
             return $data;
         }
 
-        $result = Recourse::query()->find($request->route('id'))
-            ->update($data);
-
+        $result = $recourse->update($data);
         if($result) {
             return msg(0, __LINE__);
         } else {
