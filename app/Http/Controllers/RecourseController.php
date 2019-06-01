@@ -2,19 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Recourse;
 use Illuminate\Http\Request;
 
-class RecourseController extends Controller
-{
+class RecourseController extends Controller {
     private function handleData(Request $request = null) {
         $mod = array(
             'title' => '/^[\s\S]{0,300}$/',
-            'description' => '/^[\s\S]{0,600}$/',
-            'score' => '/^(1|)\d$/',
+            'context' => '/^[\s\S]{0,600}$/',
+            'score' => '/^\d+$/',
             'tag' => '/^\d$/',
             'urgent' => '/^1|0$/'
         );
-        // TODO 处理求助数据 发布或更新
+        // 检查数据是否完整
+        if (!$request->has(array_keys($mod))) {
+            return msg(1, __LINE__);
+        }
+
+        $data = $request->only(array_keys($mod));
+        if (!check($mod, $data)) { // 检查数据是否符合 $mod 中对应的正则
+            return msg(3, '数据格式错误' . __LINE__);
+        }
+
+        return $data;
+
     }
 
     public function release(Request $request) {
