@@ -101,7 +101,19 @@ class RecourseController extends Controller {
     }
 
     public function delete(Request $request) {
-        // TODO 删除求助，(积分回收)
+        // 若已解决，无法删除
+        $recourse = Recourse::query()->find($request->route('id'));
+        if($recourse->helper != -1) {
+            return msg(3, __LINE__);
+        }
+
+        $result = Recourse::destroy($request->route('id'));
+
+        if($result) {
+            return msg(0, __LINE__);
+        } else {
+            return msg(4, __LINE__);
+        }
     }
 
     public function accept(Request $request) {
