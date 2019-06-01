@@ -6,7 +6,14 @@ use Illuminate\Http\Request;
 
 class RecourseController extends Controller
 {
-    private function handle(Request $request = null) {
+    private function handleData(Request $request = null) {
+        $mod = array(
+            'title' => '/^[\s\S]{0,300}$/',
+            'description' => '/^[\s\S]{0,600}$/',
+            'score' => '/^(1|)\d$/',
+            'tag' => '/^\d$/',
+            'urgent' => '/^1|0$/'
+        );
         // TODO 处理求助数据 发布或更新
     }
 

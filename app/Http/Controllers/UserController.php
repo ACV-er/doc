@@ -106,7 +106,7 @@ class UserController extends Controller {
         }
         $result = User::query()->where('id', session('id'))->update(['avatar' => $file_info['filename']]);
 
-        return msg($result?0:3, __LINE__);
+        return msg($result ? 0 : 3, __LINE__);
     }
 
     public function changeNickname(Request $request) {
@@ -114,13 +114,13 @@ class UserController extends Controller {
             'nickname' => '/^[\s\S]{2,60}$/'
         );
         $data = $request->only(['nickname']);
-        if(!check($mod, $data)) {
+        if (!check($mod, $data)) {
             return msg(3, '昵称格式错误' . __LINE__);
         }
 
         $result = User::query()->find(session('id'))->update($data);
 
-        if($result) {
+        if ($result) {
             // 同步更新昵称
             DB::table('documents')->where('uploader', session('id'))
                 ->update(['uploader_nickname' => $data['nickname']]);
@@ -134,8 +134,8 @@ class UserController extends Controller {
 
     public function addCollection(Request $request) {
         $user = User::query()->find(session('id'));
-        if(!$user) {
-            return msg(4, "???怎么没有这个人??? BUG！".__LINE__); //正常情况不会走到这里
+        if (!$user) {
+            return msg(4, "???怎么没有这个人??? BUG！" . __LINE__); //正常情况不会走到这里
         }
 
         $user->addCollection($request->route('id'));
@@ -144,8 +144,8 @@ class UserController extends Controller {
 
     public function delCollection(Request $request) {
         $user = User::query()->find(session('id'));
-        if(!$user) {
-            return msg(4, "???怎么没有这个人??? BUG！".__LINE__); //正常情况不会走到这里
+        if (!$user) {
+            return msg(4, "???怎么没有这个人??? BUG！" . __LINE__); //正常情况不会走到这里
         }
 
         $user->delCollection($request->route('id'));
@@ -163,7 +163,7 @@ class UserController extends Controller {
         $uploads = json_decode($user->upload, true);
         $upList = DB::table('documents')->whereIn('id', $uploads)
             ->offset($offset)->limit(10)
-            ->get( config('user.document_public_info') )->toArray();
+            ->get(config('user.document_public_info'))->toArray();
 
         return msg(0, $upList);
     }
@@ -179,7 +179,7 @@ class UserController extends Controller {
         $downloads = json_decode($user->download, true);
         $downloadList = DB::table('documents')->whereIn('id', $downloads)
             ->offset($offset)->limit(10)
-            ->get( config('user.document_public_info') )->toArray();
+            ->get(config('user.document_public_info'))->toArray();
 
         return msg(0, $downloadList);
     }
@@ -195,7 +195,7 @@ class UserController extends Controller {
         $collections = json_decode($user->collection, true);
         $collectionList = DB::table('documents')->whereIn('id', $collections)
             ->offset($offset)->limit(10)
-            ->get( config('user.document_public_info') )->toArray();
+            ->get(config('user.document_public_info'))->toArray();
 
         return msg(0, $collectionList);
     }
