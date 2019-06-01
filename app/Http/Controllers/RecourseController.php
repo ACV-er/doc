@@ -81,7 +81,19 @@ class RecourseController extends Controller {
     }
 
     public function update(Request $request) {
-        //TODO 更新求助
+        $data = $this->handleData($request);
+        if (is_string($data)) {
+            return $data;
+        }
+
+        $result = Recourse::query()->find($request->route('id'))
+            ->update($data);
+
+        if($result) {
+            return msg(0, __LINE__);
+        } else {
+            return msg(4, __LINE__);
+        }
     }
 
     public function delete(Request $request) {
