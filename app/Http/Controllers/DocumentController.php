@@ -216,7 +216,7 @@ class DocumentController extends Controller {
             DB::table('scores')->insert([
                 [
                     'user_id' => $user->id,
-                    'spend' => $document->score,
+                    'spend' => -$document->score,
                     'way' => '获取文档',
                     'time' => date('Y-m-d H:i:s', time())
                 ], [

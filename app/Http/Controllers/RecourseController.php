@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Recourse;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RecourseController extends Controller {
     private function handleData(Request $request = null) {
@@ -14,6 +16,7 @@ class RecourseController extends Controller {
             'tag' => '/^\d$/',
             'urgent' => '/^1|0$/'
         );
+
         // 检查数据是否完整
         if (!$request->has(array_keys($mod))) {
             return msg(1, __LINE__);
@@ -24,12 +27,53 @@ class RecourseController extends Controller {
             return msg(3, '数据格式错误' . __LINE__);
         }
 
-        return $data;
+        $data['presenter'] = session('id');
 
+        return $data;
     }
 
     public function release(Request $request) {
-        // TODO 发布求助,(此处扣除积分)
+        $data = $this->handleData($request);
+        if (is_string($data)) {
+            return $data;
+        }
+
+        // 默认没有提交的解答设置为空json（mysql json不能有默认值，在初始化时赋值）
+        $data['solutions'] = '[]';
+
+        $recourse = new Recourse($data);
+
+        $presenter = User::query()->find($recourse->presenter);
+
+        // 检查求助者积分数量是否够用
+        if ($presenter->score >= $recourse->score) {
+            DB::transaction(function () use ($presenter, $recourse) {
+                // 扣除积分
+                DB::table('users')->where('id', $presenter->id)
+                    ->decrement('score', $recourse->score);
+
+                //记录流水，加入事务处理
+                DB::table('scores')->insert([
+                    [
+                        'user_id' => $presenter->id,
+                        'spend' => -$recourse->score,
+                        'way' => '发起请助',
+                        'time' => date('Y-m-d H:i:s', time())
+                    ]
+                ]);
+                $result = $recourse->save();
+                if(!$result) {
+                    DB::rollBack();
+                }
+
+                DB::commit();
+                return msg(0, __LINE__);
+            });
+        } else {
+            return msg(7, __LINE__);
+        }
+
+        return msg(4, __LINE__);
     }
 
     public function submit(Request $request) {
