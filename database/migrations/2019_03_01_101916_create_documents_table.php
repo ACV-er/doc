@@ -22,7 +22,6 @@ class CreateDocumentsTable extends Migration {
             $table->string('tag');
 
             $table->unsignedInteger('uploader');
-            $table->foreign('uploader')->references('id')->on('users');
             $table->string('uploader_nickname');
             $table->unsignedInteger('downloads')->default(0);
 
