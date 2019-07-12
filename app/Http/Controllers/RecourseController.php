@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Document;
 use App\Recourse;
 use App\User;
 use Illuminate\Http\Request;
@@ -32,6 +33,11 @@ class RecourseController extends Controller {
         return $data;
     }
 
+    /**
+     * 发布求助
+     * @param Request $request
+     * @return array|string
+     */
     public function release(Request $request) {
         $data = $this->handleData($request);
         if (is_string($data)) {
@@ -62,7 +68,7 @@ class RecourseController extends Controller {
                     ]
                 ]);
                 $result = $recourse->save();
-                if(!$result) {
+                if (!$result) {
                     DB::rollBack();
                 }
 
@@ -80,10 +86,15 @@ class RecourseController extends Controller {
         // TODO 提交帮助
     }
 
+    /**
+     * 更新求助内容
+     * @param Request $request
+     * @return array|string
+     */
     public function update(Request $request) {
         // 若已解决，无法更改
         $recourse = Recourse::query()->find($request->route('id'));
-        if($recourse->helper != -1) {
+        if ($recourse->helper != -1) {
             return msg(3, __LINE__);
         }
 
@@ -93,23 +104,28 @@ class RecourseController extends Controller {
         }
 
         $result = $recourse->update($data);
-        if($result) {
+        if ($result) {
             return msg(0, __LINE__);
         } else {
             return msg(4, __LINE__);
         }
     }
 
+    /**
+     * 删除求助
+     * @param Request $request
+     * @return string
+     */
     public function delete(Request $request) {
         // 若已解决，无法删除
         $recourse = Recourse::query()->find($request->route('id'));
-        if($recourse->helper != -1) {
+        if ($recourse->helper != -1) {
             return msg(3, __LINE__);
         }
 
         $result = Recourse::destroy($request->route('id'));
 
-        if($result) {
+        if ($result) {
             return msg(0, __LINE__);
         } else {
             return msg(4, __LINE__);
@@ -117,6 +133,14 @@ class RecourseController extends Controller {
     }
 
     public function accept(Request $request) {
-        // TODO 用户采纳回答
+        // TODO 用户采纳帮助
+        // solutions
+        $recourse = Recourse::query()->find($request->route('id'));
+        $solutions = json_decode($recourse->solutions);
+        if (in_array($request->route('document_id'), $solutions)) {
+            $recourse->solution = $request->route('document_id');
+            $recourse->helper = Document::query()->find($request->route('document_id'))
+                                                 ->get('uploader');
+        }
     }
 }
