@@ -74,9 +74,9 @@ class DocumentController extends Controller {
 
     /** 封装供外部使用
      * @param Response|null $request
-     * @return array|string
+     * @return string
      */
-    public function __upload(Response $request = null) {
+    public function __upload(Request $request = null) {
         $data = $this->handleData($request);
         if (is_string($data)) { // 如果是字符串 代表报错
             return $data;

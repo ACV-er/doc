@@ -83,6 +83,17 @@ class RecourseController extends Controller {
     }
 
     public function submit(Request $request) {
+        // 先当做文件上传 默认分值为0分 （）
+        $request->offsetSet('score', 0);
+
+        // 先当做普通上传
+        // FIXME 有空把这段优化一下
+        $tmp = new DocumentController();
+        $tmp = $tmp->__upload($request);
+        if(json_decode($tmp, true)['code'] != 0) {
+            return $tmp;
+        }
+
         // TODO 提交帮助
     }
 
